@@ -4,6 +4,7 @@ import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { ThemeProvider } from 'next-themes';
 import HomePage from './pages/HomePage';
 import ConnectWallet from './pages/ConnectWallet';
+import GamePage from './pages/GamePage';
 import ProfileSetup from './components/ProfileSetup';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -50,7 +51,13 @@ function AppContent() {
     component: ConnectWallet,
   });
 
-  const routeTree = rootRoute.addChildren([indexRoute, connectWalletRoute]);
+  const gameRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/game',
+    component: GamePage,
+  });
+
+  const routeTree = rootRoute.addChildren([indexRoute, connectWalletRoute, gameRoute]);
 
   const router = createRouter({ routeTree });
 

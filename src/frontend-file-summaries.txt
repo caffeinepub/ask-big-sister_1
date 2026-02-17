@@ -1,11 +1,15 @@
 {
-  "frontend/src/App.tsx": "Main application component with routing setup, profile setup flow, and theme provider integration for the Ask Big Sister app.",
+  "frontend/src/App.tsx": "Main application component with routing setup including the new /game route, profile setup flow, and theme provider integration.",
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profile management and wallet address CRUD operations with proper cache invalidation and toast notifications.",
-  "frontend/src/pages/HomePage.tsx": "Landing page displaying hero section with branding, feature cards, and wallet connection CTA for authenticated users.",
+  "frontend/src/pages/HomePage.tsx": "Landing page with hero section, prominent game feature card with call-to-action, feature cards, and wallet connection section for authenticated users.",
   "frontend/src/pages/ConnectWallet.tsx": "Complete wallet address management screen with validation, add/edit/remove functionality, and clear user feedback using alerts and dialogs.",
-  "frontend/src/components/Header.tsx": "Application header with logo, navigation, and user dropdown menu including wallet connection access and logout functionality.",
+  "frontend/src/components/Header.tsx": "Application header with logo, navigation including new \"Play Game\" button, and user dropdown menu with wallet and logout functionality.",
   "frontend/src/components/Footer.tsx": "Application footer with copyright, Caffeine.ai attribution with UTM tracking, and social media links.",
   "frontend/src/components/ProfileSetup.tsx": "First-time user profile setup modal that collects the user's name before allowing access to the main application.",
-  "frontend/src/index.css": "Global styles with OKLCH color system featuring a warm, supportive purple/pink palette suitable for the women-focused community theme.",
-  "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, custom border radius, and design system tokens matching the supportive community aesthetic."
+  "frontend/src/index.css": "Global styles with OKLCH color system and game-specific component layer styles for tile interaction and user selection prevention.",
+  "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, custom border radius, and design system tokens matching the supportive community aesthetic.",
+  "frontend/src/game/match3/types.ts": "Type definitions and constants for the match-3 game including grid size, tile types, positions, and match results.",
+  "frontend/src/game/match3/engine.ts": "Pure game logic engine for match-3 mechanics including board initialization, match detection, tile swapping, gravity, refills, and cascade resolution.",
+  "frontend/src/game/match3/useMatch3Game.ts": "React hook managing match-3 game state, tile selection, swap validation, scoring, and animations with cascade support.",
+  "frontend/src/pages/GamePage.tsx": "Match-3 game page with 8x8 grid, bright stone-themed visuals, score display, controls, and instructions using generated stone tile assets."
 }

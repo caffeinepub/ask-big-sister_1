@@ -2,7 +2,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, MessageCircle, Sparkles } from 'lucide-react';
+import { Wallet, MessageCircle, Sparkles, Gamepad2 } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 export default function HomePage() {
@@ -42,6 +42,35 @@ export default function HomePage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Game Feature Section */}
+      <section className="py-16 px-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+        <div className="container mx-auto max-w-3xl">
+          <Card className="border-4 border-primary/20 shadow-xl">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-lg">
+                  <Gamepad2 className="w-10 h-10 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-3xl">Play Stone Match!</CardTitle>
+              <CardDescription className="text-lg">
+                Take a break and enjoy our colorful match-3 puzzle game featuring beautiful gemstones
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center pb-8">
+              <Button 
+                size="lg"
+                onClick={() => navigate({ to: '/game' })}
+                className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6"
+              >
+                <Gamepad2 className="w-6 h-6" />
+                Start Playing
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 

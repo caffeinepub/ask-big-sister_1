@@ -1,89 +1,54 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T23:34:31.026Z",
-  "summary": "Frontend adds a Connect Wallet route/screen and navigation entry point, plus React Query hooks to call new wallet APIs. Backend adds a UserProfile model with optional walletAddress and introduces wallet validation and wallet-linking/query APIs, but the diff is truncated so persistence and full CRUD API coverage cannot be fully verified. Several unrelated UI/theme/footer additions are included that were not requested.",
+  "generatedAt": "2026-02-17T23:55:24.336Z",
+  "summary": "The diff adds a new /game route, navigation entry points (Header + HomePage), and implements a browser-based match-3 game page with an 8x8 board and 6 tile types. However, required generated image assets are not evidenced as added, touch interactions are not evidenced beyond click, and HUD elements (score/restart/instructions) are not fully verifiable due to truncation. The diff also includes broad global theme token changes that were not explicitly requested.",
   "missing_requirements": [
     {
-      "id": "REQ-9",
-      "requirement": "Persist the optional wallet address per authenticated principal consistently across sessions (stable state / migration if needed).",
-      "reason": "The backend stores profiles in an in-memory Map (\"let userProfiles = Map.empty<Principal, UserProfile>();\") with no stable variable shown, so consistency across canister upgrades/sessions is not evidenced in the diff.",
+      "id": "REQ-15",
+      "requirement": "Add static image assets for the match-3 game under frontend/public/assets/generated (6 tile PNGs + background) and use them in the game UI.",
+      "reason": "GamePage references the required asset paths, but the diff summary shows no added files under frontend/public/assets/generated, so the required generated images are not evidenced as being added.",
       "evidence": [
-        "backend/main.mo"
+        "frontend/src/pages/GamePage.tsx"
       ]
     },
     {
-      "id": "REQ-9",
-      "requirement": "Provide canister methods to read/update/clear the wallet address for the current signed-in user.",
-      "reason": "Only linkWalletAddress and the beginning of getCurrentWalletAddress are visible; update and clear/unlink methods are not shown in the provided (truncated) backend diff, so their existence/behavior cannot be verified from the evidence.",
+      "id": "REQ-11",
+      "requirement": "Players can swap only adjacent tiles using mouse and touch interactions.",
+      "reason": "GamePage shows only onClick-based selection/swapping; no touch-specific handlers (e.g., onTouchStart/onTouchMove) are evidenced in the shown diff content.",
       "evidence": [
-        "backend/main.mo (truncated)",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/pages/GamePage.tsx"
       ]
     },
     {
-      "id": "REQ-10",
-      "requirement": "Surface errors from the canister to the user in a clear English message on the Connect Wallet screen and keep the UI usable after an error.",
-      "reason": "The ConnectWallet page file is truncated, and while mutation hooks toast errors, the full on-screen error handling and resulting UI state cannot be verified from the provided snippet.",
+      "id": "REQ-12",
+      "requirement": "Add HUD and controls: show current score, a restart/new game control, and a visible English instruction block.",
+      "reason": "The provided portion of GamePage shows the title/description and board rendering, but the side panel (where HUD/controls likely live) is truncated, so score display, restart control, and instructions are not verifiable from the diff summary alone.",
       "evidence": [
-        "frontend/src/pages/ConnectWallet.tsx (truncated)",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/pages/GamePage.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added Caffeine.ai attribution with UTM tracking and external social links (Twitter/GitHub) in the footer.",
-      "reason": "Not requested by REQ-8/9/10 and unrelated to Connect Wallet functionality.",
+      "description": "Broad global theme token/color system changes in frontend/src/index.css beyond game-specific styling.",
+      "reason": "REQ-14 asks for a bright stone-themed visual style for the game screen, but the diff changes many global CSS variables (background/foreground/primary/etc.) affecting the entire app, which is not explicitly requested as part of adding the game.",
       "evidence": [
-        "frontend/src/components/Footer.tsx"
-      ]
-    },
-    {
-      "description": "Introduced/changed global visual theme tokens and Tailwind configuration (OKLCH palette, typography/container-queries/animate plugins).",
-      "reason": "Not requested in this BuildRequest (theme work is outside REQ-8/9/10).",
-      "evidence": [
-        "frontend/src/index.css",
-        "frontend/index.css",
-        "frontend/tailwind.config.js"
-      ]
-    },
-    {
-      "description": "Backend wallet address validation enforces an Ethereum-style 66-character 0x-prefixed hex string.",
-      "reason": "The BuildRequest only asked for “basic validation” and did not specify chain/address format; this is a stricter, format-specific assumption.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/pages/ConnectWallet.tsx (truncated)"
-      ]
-    },
-    {
-      "description": "Added an access-control initialization path using a secret URL parameter (caffeineAdminToken) during actor creation.",
-      "reason": "Not requested by REQ-8/9/10 and introduces additional auth/initialization behavior beyond 'keep Internet Identity as the only authentication mechanism'.",
-      "evidence": [
-        "frontend/src/hooks/useActor.ts"
+        "frontend/src/index.css"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.63,
   "changed_files": [
-    "all_files_summary.json",
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/index.css",
-    "frontend/index.html",
     "frontend/src/App.tsx",
-    "frontend/src/components/Footer.tsx",
     "frontend/src/components/Header.tsx",
-    "frontend/src/components/ProfileSetup.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/game/match3/engine.ts",
+    "frontend/src/game/match3/types.ts",
+    "frontend/src/game/match3/useMatch3Game.ts",
     "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/pages/ConnectWallet.tsx",
+    "frontend/src/pages/GamePage.tsx",
     "frontend/src/pages/HomePage.tsx",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

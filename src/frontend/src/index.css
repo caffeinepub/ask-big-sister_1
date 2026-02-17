@@ -66,3 +66,14 @@
         font-feature-settings: "rlig" 1, "calt" 1;
     }
 }
+
+@layer components {
+    /* Game-specific styles for better tile interaction */
+    .game-tile {
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+}

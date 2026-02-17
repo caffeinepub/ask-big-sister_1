@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Wallet, User, LogOut } from 'lucide-react';
+import { Wallet, User, LogOut, Gamepad2 } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 export default function Header() {
@@ -57,6 +57,15 @@ export default function Header() {
         </button>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => navigate({ to: '/game' })}
+            className="gap-2"
+          >
+            <Gamepad2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Play Game</span>
+          </Button>
+
           {isAuthenticated && userProfile ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

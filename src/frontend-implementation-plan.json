@@ -1,48 +1,158 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Ask Big Sister — Connect Wallet (link wallet address) UI + flow",
+  "title": "Stone Match — Bright stone-themed 2D match-3 game (frontend)",
   "requirements": [
     {
-      "id": "REQ-8",
-      "summary": "Add a visible “Connect Wallet” entry point for signed-in users and a screen that explains it links an address (not a live wallet connection).",
+      "id": "REQ-11",
+      "summary": "Add a new in-browser 2D match-3 game screen with an interactive grid, swaps, match detection, clearing, gravity drop, and refills with cascades.",
       "acceptanceCriteria": [
-        "When a user is signed in, they can access a visible “Connect Wallet” action from the app navigation or profile area.",
-        "The screen clearly indicates this feature links a wallet address to the user profile (not a live wallet connection).",
-        "All user-facing text is in English."
+        "A new route (e.g., /game) displays the match-3 board and can be opened without errors.",
+        "The board uses a consistent grid size (e.g., 8x8) with at least 5 distinct tile types.",
+        "Players can swap only adjacent tiles using mouse and touch interactions.",
+        "After a swap, any horizontal or vertical match of 3+ identical tiles is detected and cleared.",
+        "Tiles above cleared spaces fall downward and new tiles spawn to refill the grid until stable (no immediate matches remain, or the system resolves cascades deterministically).",
+        "A score counter increments based on cleared tiles (at minimum: +10 per tile cleared), including cascades."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ConnectWallet.tsx",
+          "path": "frontend/src/pages/GamePage.tsx",
           "operation": "create",
-          "description": "Create the Connect Wallet screen UI and explanatory copy clarifying it stores/links a wallet address to the user profile and is not a live wallet connection. Use shadcn-ui components (e.g., Card, Button, Input, Alert) for consistent layout and messaging; verify the component's usage instructions before implementing."
+          "description": "Create the Match-3 game screen that renders an 8x8 (or similar) 2D grid, handles pointer (mouse/touch) interactions for selecting and swapping adjacent tiles only, and runs the core resolve loop (detect matches, clear, drop, refill, cascade) entirely in the browser."
         },
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire the Connect Wallet entry point into the signed-in user navigation/profile area and register navigation to the Connect Wallet screen/route. Ensure the entry point is only shown when Internet Identity is authenticated (via existing auth state)."
+          "path": "frontend/src/game/match3/engine.ts",
+          "operation": "create",
+          "description": "Implement the pure game-logic engine for a 2D match-3 board: board initialization (avoid immediate matches), adjacency validation, swap simulation/rollback (if no match), match finding (horizontal/vertical 3+), clearing, gravity drop, refill, and deterministic cascade resolution."
+        },
+        {
+          "path": "frontend/src/game/match3/types.ts",
+          "operation": "create",
+          "description": "Define shared types/constants for the 2D match-3 game (grid size, tile type IDs >= 5 distinct types, coordinate types, match/clear results) to keep UI and engine consistent."
+        },
+        {
+          "path": "frontend/src/game/match3/useMatch3Game.ts",
+          "operation": "create",
+          "description": "Add a React hook that owns board state and exposes actions (select, attemptSwap, resolve, restart) and computed outputs needed by the UI while keeping the engine deterministic."
         }
       ]
     },
     {
-      "id": "REQ-10",
-      "summary": "Implement view/add/edit/remove linked wallet address flow with validation, optimistic UI updates, and clear error handling using backend wallet-address APIs.",
+      "id": "REQ-12",
+      "summary": "Add a basic HUD with score, restart/new game control, and English instructions on the game screen.",
       "acceptanceCriteria": [
-        "The Connect Wallet screen shows the currently linked wallet address (if present).",
-        "Users can enter a wallet address and save it; invalid/empty input is rejected with an English validation message.",
-        "Users can remove the linked wallet address and the UI updates immediately to reflect the change.",
-        "Errors from the canister are surfaced to the user in a clear English message, and the UI remains usable after an error."
+        "HUD displays score and updates immediately after matches are cleared.",
+        "A restart/new game action resets score and regenerates a new board.",
+        "Instructions are visible on the game screen and are written in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useWalletAddress.ts",
-          "operation": "create",
-          "description": "Add a React Query hook wrapping wallet address read/update/clear calls using the existing actor from useActor, including loading/error states, cache invalidation, and immediate UI updates after successful mutations."
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Add HUD elements (score display, restart/new game button, and an English instruction block) and wire them to the match-3 hook so score updates immediately after clears/cascades and restart regenerates a fresh board and resets score."
         },
         {
-          "path": "frontend/src/pages/ConnectWallet.tsx",
+          "path": "frontend/src/game/match3/useMatch3Game.ts",
           "operation": "modify",
-          "description": "Implement the full flow: fetch and display current wallet address, allow add/edit with basic validation (reject empty/invalid format with English messages), allow remove/unlink, and surface backend errors in a clear English message while keeping the UI usable. Use shadcn-ui form/feedback components (e.g., Input, Button, Alert) for validation and error display; verify the component's usage instructions before implementing."
+          "description": "Extend the hook to track score (+10 per tile cleared minimum, including cascades) and expose a restart/new-game action that resets both score and board state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "summary": "Integrate the match-3 screen into existing navigation and router with a clear entry point.",
+      "acceptanceCriteria": [
+        "The router in frontend/src/App.tsx includes a route to the game page.",
+        "The existing header (frontend/src/components/Header.tsx) and/or home page (frontend/src/pages/HomePage.tsx) provides a visible way to navigate to the game page.",
+        "Navigation to/from the game page works without requiring changes to immutable hook files."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register a new /game route in the TanStack Router route tree and wire it to the new GamePage component."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Add a visible navigation entry (e.g., a button/link) that routes to /game from the existing header without changing any immutable hook files."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Add a prominent entry point (e.g., a feature card or call-to-action button) that navigates to /game so users can discover the Match-3 game from the current UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "summary": "Apply a bright, stone-themed visual style across the game screen (tiles, background, HUD typography/spacing/buttons) using Tailwind and existing UI components.",
+      "acceptanceCriteria": [
+        "Game tiles and background use a bright, stone/gem-inspired palette (not muted).",
+        "Text (score/instructions/buttons) meets basic readability (clear contrast against backgrounds).",
+        "Game screen styling is consistent (spacing, typography, button styles) and uses Tailwind + existing UI components where appropriate."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Apply a bright, gem/stone arcade look using Tailwind utility classes and existing shadcn/ui components (e.g., Button/Card) for consistent spacing/typography and high-contrast readable HUD over a vibrant background. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add small, scoped base/component layer styles (if needed) to support consistent game UI readability (e.g., default text smoothing/selection outlines for interactive tiles) without introducing new global stylesheet paths."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Add and use generated static image assets for tile faces and an optional background under frontend/public/assets/generated.",
+      "acceptanceCriteria": [
+        "All new images are stored under frontend/public/assets/generated and referenced by URL paths from the frontend.",
+        "The game uses the generated tile images (or a generated sprite sheet) for rendering tiles.",
+        "No backend image routing is introduced."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/stone-tile-red.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the red bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-blue.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the blue bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-green.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the green bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-yellow.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the yellow bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-purple.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the purple bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-orange.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated tile image asset (transparent PNG) for the orange bright faceted cut-stone tile."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-match-bg.dim_1920x1080.png",
+          "operation": "create",
+          "description": "Add generated background image asset for the bright colorful stone/gem cavern background."
+        },
+        {
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Wire the generated assets into the game UI by mapping tile types to the corresponding images (frontend/public/assets/generated/stone-tile-red.dim_256x256.png, frontend/public/assets/generated/stone-tile-blue.dim_256x256.png, frontend/public/assets/generated/stone-tile-green.dim_256x256.png, frontend/public/assets/generated/stone-tile-yellow.dim_256x256.png, frontend/public/assets/generated/stone-tile-purple.dim_256x256.png, frontend/public/assets/generated/stone-tile-orange.dim_256x256.png) and optionally using the background (frontend/public/assets/generated/stone-match-bg.dim_1920x1080.png); ensure assets are referenced as static public files and no backend image routing is added."
         }
       ]
     }

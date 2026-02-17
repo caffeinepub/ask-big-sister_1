@@ -1,78 +1,136 @@
 {
   "kind": "build_request",
-  "title": "Add a “Connect Wallet” (link wallet address) feature to Ask Big Sister",
-  "projectName": "Ask Big Sister",
+  "title": "Add bright stone-themed 2D match-3 game",
+  "projectName": "Stone Match",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-8",
-      "text": "Add a “Connect Wallet” entry point in the UI for signed-in users that lets them link a crypto wallet address to their Ask Big Sister profile/session without relying on third-party wallet integrations.",
+      "id": "REQ-11",
+      "text": "Add a new Match-3 game screen that runs entirely in the browser: render a 2D grid of bright, cut-stone tiles; allow the player to swap adjacent tiles via mouse/touch; detect matches of 3 or more identical tiles; clear matched tiles; drop tiles down to fill gaps; and refill with new random tiles.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-5"
         ],
         "quotes": [
-          "In my Ask Big Sister app, install connect wallet."
+          "Make a 2D game where you have to match 3 or more of the same cut object to get points,  make it bright colors of stone's."
         ]
       },
       "acceptanceCriteria": [
-        "When a user is signed in, they can access a visible “Connect Wallet” action from the app navigation or profile area.",
-        "The screen clearly indicates this feature links a wallet address to the user profile (not a live wallet connection).",
-        "All user-facing text is in English."
+        "A new route (e.g., /game) displays the match-3 board and can be opened without errors.",
+        "The board uses a consistent grid size (e.g., 8x8) with at least 5 distinct tile types.",
+        "Players can swap only adjacent tiles using mouse and touch interactions.",
+        "After a swap, any horizontal or vertical match of 3+ identical tiles is detected and cleared.",
+        "Tiles above cleared spaces fall downward and new tiles spawn to refill the grid until stable (no immediate matches remain, or the system resolves cascades deterministically).",
+        "A score counter increments based on cleared tiles (at minimum: +10 per tile cleared), including cascades."
       ]
     },
     {
-      "id": "REQ-9",
-      "text": "Extend the backend user profile model to store an optional wallet address string for each authenticated principal, and provide canister methods to read/update/clear the wallet address for the current signed-in user.",
-      "target": "backend",
+      "id": "REQ-12",
+      "text": "Add basic game HUD and controls: show current score, a simple restart/new game control, and a short on-screen instruction block explaining how to play (English).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-5"
         ],
         "quotes": [
-          "In my Ask Big Sister app, install connect wallet."
+          "...match 3 or more... to get points..."
         ]
       },
       "acceptanceCriteria": [
-        "A signed-in user can set a wallet address and later retrieve it consistently across sessions.",
-        "A signed-in user can clear the linked wallet address.",
-        "A user can only read/update their own wallet address (no ability to modify other users)."
+        "HUD displays score and updates immediately after matches are cleared.",
+        "A restart/new game action resets score and regenerates a new board.",
+        "Instructions are visible on the game screen and are written in English."
       ]
     },
     {
-      "id": "REQ-10",
-      "text": "Implement the frontend flow to view, add, edit, and remove the linked wallet address using the new backend APIs, including basic validation and error handling.",
-      "target": "both",
+      "id": "REQ-13",
+      "text": "Integrate the Match-3 game into the existing React app navigation by adding a clear entry point from the current UI (e.g., in the header menu and/or the home page) and register the new route in the app router.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-5"
         ],
         "quotes": [
-          "In my Ask Big Sister app, install connect wallet."
+          "Make a 2D game..."
         ]
       },
       "acceptanceCriteria": [
-        "The Connect Wallet screen shows the currently linked wallet address (if present).",
-        "Users can enter a wallet address and save it; invalid/empty input is rejected with an English validation message.",
-        "Users can remove the linked wallet address and the UI updates immediately to reflect the change.",
-        "Errors from the canister are surfaced to the user in a clear English message, and the UI remains usable after an error."
+        "The router in frontend/src/App.tsx includes a route to the game page.",
+        "The existing header (frontend/src/components/Header.tsx) and/or home page (frontend/src/pages/HomePage.tsx) provides a visible way to navigate to the game page.",
+        "Navigation to/from the game page works without requiring changes to immutable hook files."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Apply a bright, stone-themed visual style to the game screen: vivid gem/stone colors, high-contrast readable HUD text, and a playful arcade feel consistent across the game UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "make it bright colors of stone's."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Game tiles and background use a bright, stone/gem-inspired palette (not muted).",
+        "Text (score/instructions/buttons) meets basic readability (clear contrast against backgrounds).",
+        "Game screen styling is consistent (spacing, typography, button styles) and uses Tailwind + existing UI components where appropriate."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Add static image assets for the match-3 game as generated files under frontend/public/assets/generated and use them in the game UI (tiles and optionally a background).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "...cut object...bright colors of stone's."
+        ]
+      },
+      "acceptanceCriteria": [
+        "All new images are stored under frontend/public/assets/generated and referenced by URL paths from the frontend.",
+        "The game uses the generated tile images (or a generated sprite sheet) for rendering tiles.",
+        "No backend image routing is introduced."
       ]
     }
   ],
   "constraints": [
-    "Do not integrate third-party wallet providers or browser wallet extensions (e.g., MetaMask, WalletConnect, Plug/other external wallet SDKs).",
-    "Keep Internet Identity as the only authentication mechanism.",
-    "Backend must remain a single Motoko actor (all logic in the main actor file); only add a migration file if existing stable state requires it.",
-    "Do not modify files under frontend immutablePaths; compose existing UI components instead."
+    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
+    "Do not edit any frontend immutable paths listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Keep the backend as a single Motoko actor in backend/main.mo; only add backend changes if explicitly required by the game.",
+    "All user-facing text added for the game must be in English."
   ],
   "nonGoals": [
-    "Sending transactions, signing messages, or proving wallet ownership via cryptographic signatures.",
-    "Displaying balances, tokens, NFTs, or on-chain activity.",
-    "Any payment or checkout flow."
+    "Do not add real-money payments, wallet-based gameplay, or third-party wallet integrations for the game.",
+    "Do not add multiplayer, real-time features, chat, or WebSocket-based syncing.",
+    "Do not integrate external databases or external game services.",
+    "Do not implement complex level progression/maps unless separately requested (endless / arcade match-3 is sufficient).",
+    "Do not remove or rewrite existing authentication/wallet/profile features unless necessary for navigation to the game page."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-red.dim_256x256.png)",
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-blue.dim_256x256.png)",
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-green.dim_256x256.png)",
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-yellow.dim_256x256.png)",
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-purple.dim_256x256.png)",
+      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-orange.dim_256x256.png)",
+      "Bright colorful stone/gem cavern background, soft gradients, subtle texture (stone-match-bg.dim_1920x1080.png)"
+    ],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

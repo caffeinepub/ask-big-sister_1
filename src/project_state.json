@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Build a community Q&A app where users can post questions and answer each other, with an option for an AI to also provide supportive answers.",
+  "projectStateVersion": 7,
+  "summary": "Pivot to building a bright, colorful 2D match-3 style game where players match 3+ identical “cut stone” objects to score points.",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-red.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-blue.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-green.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-yellow.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-purple.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-orange.dim_256x256.png)\n- Bright colorful stone/gem cavern background, soft gradients, subtle texture (stone-match-bg.dim_1920x1080.png)",
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-sign-in-and-a-minimal-user-profile-identity-used-throughout-the-app-display-name-derived-from-the-authenticated-principal-with-an-optional-editable-nickname",
@@ -61,6 +62,46 @@
         "REQ-10"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-new-match-3-game-screen-that-runs-entirely-in-the-browser-render-a-2d-grid-of-bright-cut-stone-tiles-allow-the-player-to-swap-adjacent-tiles-via-mouse-touch-detect-matches-of-3-or-more-identical-tiles-clear-matched-tiles-drop-tiles-down-to-fill-gaps-and-refill-with-new-random-tiles",
+      "title": "Add a new Match-3 game screen that runs entirely in the browser: render a 2D grid of bright, cut-stone tiles; allow the player to swap adjacent tiles via mouse/touch; detect matches of 3 or more identical tiles; clear matched tiles; drop tiles down to fill gaps; and refill with new random tiles.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-game-hud-and-controls-show-current-score-a-simple-restart-new-game-control-and-a-short-on-screen-instruction-block-explaining-how-to-play-english",
+      "title": "Add basic game HUD and controls: show current score, a simple restart/new game control, and a short on-screen instruction block explaining how to play (English).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-match-3-game-into-the-existing-react-app-navigation-by-adding-a-clear-entry-point-from-the-current-ui-e-g-in-the-header-menu-and-or-the-home-page-and-register-the-new-route-in-the-app-router",
+      "title": "Integrate the Match-3 game into the existing React app navigation by adding a clear entry point from the current UI (e.g., in the header menu and/or the home page) and register the new route in the app router.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-bright-stone-themed-visual-style-to-the-game-screen-vivid-gem-stone-colors-high-contrast-readable-hud-text-and-a-playful-arcade-feel-consistent-across-the-game-ui",
+      "title": "Apply a bright, stone-themed visual style to the game screen: vivid gem/stone colors, high-contrast readable HUD text, and a playful arcade feel consistent across the game UI.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-static-image-assets-for-the-match-3-game-as-generated-files-under-frontend-public-assets-generated-and-use-them-in-the-game-ui-tiles-and-optionally-a-background",
+      "title": "Add static image assets for the match-3 game as generated files under frontend/public/assets/generated and use them in the game UI (tiles and optionally a background).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -111,9 +152,15 @@
         "REQ-9"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Create a 2D match-3 game: match 3+ identical cut-stone tiles to earn points, using a bright stone-themed color palette.",
+      "reqIds": [],
+      "status": "pending"
     }
   ],
-  "gameProjectType": "none",
+  "gameProjectType": "2d",
   "projectName": "Ask Big Sister",
   "clarification_mode": "instant",
   "clarification_rounds": 0
