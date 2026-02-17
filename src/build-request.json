@@ -1,0 +1,78 @@
+{
+  "kind": "build_request",
+  "title": "Add a “Connect Wallet” (link wallet address) feature to Ask Big Sister",
+  "projectName": "Ask Big Sister",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-8",
+      "text": "Add a “Connect Wallet” entry point in the UI for signed-in users that lets them link a crypto wallet address to their Ask Big Sister profile/session without relying on third-party wallet integrations.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "In my Ask Big Sister app, install connect wallet."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a user is signed in, they can access a visible “Connect Wallet” action from the app navigation or profile area.",
+        "The screen clearly indicates this feature links a wallet address to the user profile (not a live wallet connection).",
+        "All user-facing text is in English."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Extend the backend user profile model to store an optional wallet address string for each authenticated principal, and provide canister methods to read/update/clear the wallet address for the current signed-in user.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "In my Ask Big Sister app, install connect wallet."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A signed-in user can set a wallet address and later retrieve it consistently across sessions.",
+        "A signed-in user can clear the linked wallet address.",
+        "A user can only read/update their own wallet address (no ability to modify other users)."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Implement the frontend flow to view, add, edit, and remove the linked wallet address using the new backend APIs, including basic validation and error handling.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "In my Ask Big Sister app, install connect wallet."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Connect Wallet screen shows the currently linked wallet address (if present).",
+        "Users can enter a wallet address and save it; invalid/empty input is rejected with an English validation message.",
+        "Users can remove the linked wallet address and the UI updates immediately to reflect the change.",
+        "Errors from the canister are surfaced to the user in a clear English message, and the UI remains usable after an error."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not integrate third-party wallet providers or browser wallet extensions (e.g., MetaMask, WalletConnect, Plug/other external wallet SDKs).",
+    "Keep Internet Identity as the only authentication mechanism.",
+    "Backend must remain a single Motoko actor (all logic in the main actor file); only add a migration file if existing stable state requires it.",
+    "Do not modify files under frontend immutablePaths; compose existing UI components instead."
+  ],
+  "nonGoals": [
+    "Sending transactions, signing messages, or proving wallet ownership via cryptographic signatures.",
+    "Displaying balances, tokens, NFTs, or on-chain activity.",
+    "Any payment or checkout flow."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

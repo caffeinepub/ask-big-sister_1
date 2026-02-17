@@ -1,0 +1,44 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-connect-wallet-entry-point-in-the-ui-for-signed-in-users-that-lets-them-link-a-crypto-wallet-address-to-their-ask-big-sister-profile-session-without-relying-on-third-party-wallet-integrations",
+      "featureTitle": "Add a “Connect Wallet” entry point in the UI for signed-in users that lets them link a crypto wallet address to their Ask Big Sister profile/session without relying on third-party wallet integrations.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/ConnectWallet.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-the-frontend-flow-to-view-add-edit-and-remove-the-linked-wallet-address-using-the-new-backend-apis-including-basic-validation-and-error-handling",
+      "featureTitle": "Implement the frontend flow to view, add, edit, and remove the linked wallet address using the new backend APIs, including basic validation and error handling.",
+      "files": [
+        "frontend/src/pages/ConnectWallet.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

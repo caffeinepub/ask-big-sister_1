@@ -1,0 +1,89 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-17T23:34:31.026Z",
+  "summary": "Frontend adds a Connect Wallet route/screen and navigation entry point, plus React Query hooks to call new wallet APIs. Backend adds a UserProfile model with optional walletAddress and introduces wallet validation and wallet-linking/query APIs, but the diff is truncated so persistence and full CRUD API coverage cannot be fully verified. Several unrelated UI/theme/footer additions are included that were not requested.",
+  "missing_requirements": [
+    {
+      "id": "REQ-9",
+      "requirement": "Persist the optional wallet address per authenticated principal consistently across sessions (stable state / migration if needed).",
+      "reason": "The backend stores profiles in an in-memory Map (\"let userProfiles = Map.empty<Principal, UserProfile>();\") with no stable variable shown, so consistency across canister upgrades/sessions is not evidenced in the diff.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "requirement": "Provide canister methods to read/update/clear the wallet address for the current signed-in user.",
+      "reason": "Only linkWalletAddress and the beginning of getCurrentWalletAddress are visible; update and clear/unlink methods are not shown in the provided (truncated) backend diff, so their existence/behavior cannot be verified from the evidence.",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "requirement": "Surface errors from the canister to the user in a clear English message on the Connect Wallet screen and keep the UI usable after an error.",
+      "reason": "The ConnectWallet page file is truncated, and while mutation hooks toast errors, the full on-screen error handling and resulting UI state cannot be verified from the provided snippet.",
+      "evidence": [
+        "frontend/src/pages/ConnectWallet.tsx (truncated)",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Added Caffeine.ai attribution with UTM tracking and external social links (Twitter/GitHub) in the footer.",
+      "reason": "Not requested by REQ-8/9/10 and unrelated to Connect Wallet functionality.",
+      "evidence": [
+        "frontend/src/components/Footer.tsx"
+      ]
+    },
+    {
+      "description": "Introduced/changed global visual theme tokens and Tailwind configuration (OKLCH palette, typography/container-queries/animate plugins).",
+      "reason": "Not requested in this BuildRequest (theme work is outside REQ-8/9/10).",
+      "evidence": [
+        "frontend/src/index.css",
+        "frontend/index.css",
+        "frontend/tailwind.config.js"
+      ]
+    },
+    {
+      "description": "Backend wallet address validation enforces an Ethereum-style 66-character 0x-prefixed hex string.",
+      "reason": "The BuildRequest only asked for “basic validation” and did not specify chain/address format; this is a stricter, format-specific assumption.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/pages/ConnectWallet.tsx (truncated)"
+      ]
+    },
+    {
+      "description": "Added an access-control initialization path using a secret URL parameter (caffeineAdminToken) during actor creation.",
+      "reason": "Not requested by REQ-8/9/10 and introduces additional auth/initialization behavior beyond 'keep Internet Identity as the only authentication mechanism'.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts"
+      ]
+    }
+  ],
+  "confidence": 0.66,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Footer.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/ProfileSetup.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/ConnectWallet.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

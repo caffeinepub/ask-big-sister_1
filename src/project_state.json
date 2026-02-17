@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Build a community Q&A app where users can post questions and answer each other, with an option for an AI to also provide supportive answers.",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-implement-internet-identity-sign-in-and-a-minimal-user-profile-identity-used-throughout-the-app-display-name-derived-from-the-authenticated-principal-with-an-optional-editable-nickname",
+      "title": "Implement Internet Identity sign-in and a minimal user profile identity used throughout the app (display name derived from the authenticated principal, with an optional editable nickname).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-screens-to-browse-questions-view-a-question-detail-page-and-allow-signed-in-users-to-post-new-questions-and-post-answers-to-existing-questions",
+      "title": "Create frontend screens to browse questions, view a question detail page, and allow signed-in users to post new questions and post answers to existing questions.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-ai-can-also-answer-questions-feature-on-the-question-detail-page-allow-users-to-request-an-ai-style-supportive-response-generated-deterministically-on-canister-no-external-ai-llm-api-using-templates-heuristics-and-store-it-as-a-special-answer-type-attributed-to-big-sister-ai",
+      "title": "Add an in-app “AI can also answer questions” feature: on the Question Detail page, allow users to request an AI-style supportive response, generated deterministically on-canister (no external AI/LLM API) using templates/heuristics, and store it as a special answer type attributed to “Big Sister AI”.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-a-cohesive-visual-theme-suitable-for-a-supportive-women-focused-q-a-community-warm-calm-editorial-feel-accessible-typography-consistent-spacing-and-components-and-apply-it-consistently-across-the-app",
+      "title": "Establish a cohesive visual theme suitable for a supportive women-focused Q&A community (warm, calm, editorial feel; accessible typography; consistent spacing and components) and apply it consistently across the app.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-a-small-set-of-static-brand-assets-and-render-them-in-the-ui-from-frontend-public-assets-generated-no-backend-image-routing",
+      "title": "Generate and include a small set of static brand assets and render them in the UI from frontend/public/assets/generated (no backend image routing).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-connect-wallet-entry-point-in-the-ui-for-signed-in-users-that-lets-them-link-a-crypto-wallet-address-to-their-ask-big-sister-profile-session-without-relying-on-third-party-wallet-integrations",
+      "title": "Add a “Connect Wallet” entry point in the UI for signed-in users that lets them link a crypto wallet address to their Ask Big Sister profile/session without relying on third-party wallet integrations.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-frontend-flow-to-view-add-edit-and-remove-the-linked-wallet-address-using-the-new-backend-apis-including-basic-validation-and-error-handling",
+      "title": "Implement the frontend flow to view, add, edit, and remove the linked wallet address using the new backend APIs, including basic validation and error handling.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Allow users to post/ask questions to the community",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Allow users to answer/reply to other users' questions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Provide an AI feature that can also answer questions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add backend data models and APIs to create and fetch community questions (including title, body, author, createdAt) and to list questions in reverse chronological order with basic pagination support.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add backend data models and APIs to create and fetch answers for a given question (including body, author, createdAt), and return answers ordered from oldest to newest by default.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add a “Connect Wallet” feature to the Ask Big Sister app (allow users to connect a crypto wallet to their account/session).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Extend the backend user profile model to store an optional wallet address string for each authenticated principal, and provide canister methods to read/update/clear the wallet address for the current signed-in user.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Ask Big Sister",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
