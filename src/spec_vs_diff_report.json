@@ -1,16 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T00:03:46.222Z",
-  "summary": "The diff implements state-stabilization changes in the Match-3 hook (refs + functional updates + animation gating), introduces unique tile IDs and de-duplication logic to avoid double-counting overlaps, and adds a guarded tile-image lookup to prevent invalid render indices. Based on the provided diff summary, all three requested requirements appear to be addressed.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.68,
+  "generatedAt": "2026-02-18T00:19:36.268Z",
+  "summary": "Diff implements core match-3 board model and introduces a React Three Fiber 3D board with textured tiles, colored stone meshes, and selection highlighting. However, the diff summary does not provide clear evidence that swap and cascade/clear animations are actually wired into the 3D scene, and the required texture image assets themselves are not shown as added.",
+  "missing_requirements": [
+    {
+      "id": "REQ-6",
+      "requirement": "Animate swaps and clears/cascades in the 3D scene so state changes are visually understandable (and keep input disabled during animation).",
+      "reason": "A helper (animateStonePosition) is added, but the 3D board component is truncated and the diff summary does not show any code that applies position/scale/fade animations during swaps or during clear/refill cascades. The game hook uses a timeout for logic resolution, but that alone is not evidence of 3D mesh animation.",
+      "evidence": [
+        "frontend/src/game/three/useStoneAnimations.ts",
+        "frontend/src/game/three/StoneMatch3DBoard.tsx (truncated)",
+        "frontend/src/game/match3/useMatch3Game.ts"
+      ]
+    },
+    {
+      "requirement": "Provide the required seamless stone texture images: stone-tile-texture.dim_1024x1024.png and stone-texture-base.dim_1024x1024.png.",
+      "reason": "The 3D board references these asset paths via useTexture(), but the diff summary does not show the image files being added anywhere in the repository changes.",
+      "evidence": [
+        "frontend/src/game/three/StoneMatch3DBoard.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Orbit camera controls added to the 3D scene (OrbitControls).",
+      "reason": "REQ-5/6 request a 3D presentation with clicking/selecting/swapping stones, but do not explicitly request free orbit camera controls; this is additional interaction beyond the stated requirements.",
+      "evidence": [
+        "frontend/src/game/three/StoneMatch3DBoard.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/game/match3/engine.ts",
     "frontend/src/game/match3/types.ts",
     "frontend/src/game/match3/useMatch3Game.ts",
+    "frontend/src/game/three/StoneMatch3DBoard.tsx",
+    "frontend/src/game/three/layout.ts",
+    "frontend/src/game/three/materials.ts",
+    "frontend/src/game/three/useStoneAnimations.ts",
     "frontend/src/pages/GamePage.tsx",
     "project_state.json"
   ]

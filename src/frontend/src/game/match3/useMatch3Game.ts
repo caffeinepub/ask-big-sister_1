@@ -56,7 +56,7 @@ export function useMatch3Game() {
             boardRef.current = finalBoard;
             setIsAnimating(false);
             isAnimatingRef.current = false;
-          }, 300);
+          }, 600);
           
           return swappedBoard;
         }

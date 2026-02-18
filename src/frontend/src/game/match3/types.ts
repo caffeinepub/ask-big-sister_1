@@ -15,6 +15,7 @@ export interface Tile {
   id: string;
 }
 
+// Board is a strict 2D grid: exactly one Tile per [row][col] position
 export type Board = Tile[][];
 
 export interface Match {

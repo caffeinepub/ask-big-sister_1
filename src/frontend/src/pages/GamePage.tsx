@@ -1,35 +1,15 @@
 import { useMatch3Game } from '../game/match3/useMatch3Game';
-import { Position, GRID_SIZE, TileType } from '../game/match3/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RotateCcw, Sparkles } from 'lucide-react';
-
-const TILE_IMAGES = [
-  '/assets/generated/stone-tile-red.dim_256x256.png',
-  '/assets/generated/stone-tile-blue.dim_256x256.png',
-  '/assets/generated/stone-tile-green.dim_256x256.png',
-  '/assets/generated/stone-tile-yellow.dim_256x256.png',
-  '/assets/generated/stone-tile-purple.dim_256x256.png',
-  '/assets/generated/stone-tile-orange.dim_256x256.png',
-];
+import { Suspense } from 'react';
+import StoneMatch3DBoard from '../game/three/StoneMatch3DBoard';
 
 export default function GamePage() {
   const { board, selectedTile, score, isAnimating, selectTile, restart } = useMatch3Game();
 
   const handleTileClick = (row: number, col: number) => {
     selectTile({ row, col });
-  };
-
-  const isSelected = (row: number, col: number): boolean => {
-    return selectedTile?.row === row && selectedTile?.col === col;
-  };
-
-  const getTileImage = (type: TileType): string => {
-    // Guard against invalid tile types
-    if (type < 0 || type >= TILE_IMAGES.length) {
-      return TILE_IMAGES[0]; // Fallback to first image
-    }
-    return TILE_IMAGES[type];
   };
 
   return (
@@ -39,12 +19,12 @@ export default function GamePage() {
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/40" />
       
-      <div className="container mx-auto max-w-4xl relative z-10">
+      <div className="container mx-auto max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8 space-y-4">
           <h1 className="text-5xl font-bold text-white drop-shadow-lg flex items-center justify-center gap-3">
             <Sparkles className="w-10 h-10 text-yellow-300" />
-            Stone Match
+            Stone Match 3D
             <Sparkles className="w-10 h-10 text-yellow-300" />
           </h1>
           <p className="text-xl text-white/90 drop-shadow-md max-w-2xl mx-auto">
@@ -54,47 +34,25 @@ export default function GamePage() {
 
         {/* Game Container */}
         <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
-          {/* Game Board */}
-          <Card className="bg-black/60 backdrop-blur-sm border-4 border-yellow-500/50 shadow-2xl">
+          {/* 3D Game Board */}
+          <Card className="bg-black/60 backdrop-blur-sm border-4 border-yellow-500/50 shadow-2xl w-full lg:w-auto">
             <CardContent className="p-6">
               <div 
-                className="grid gap-2 select-none"
-                style={{ 
-                  gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-                  maxWidth: '480px',
-                }}
+                className="w-full aspect-square max-w-[600px] mx-auto"
+                style={{ minHeight: '400px' }}
               >
-                {board.map((row, rowIndex) =>
-                  row.map((tile, colIndex) => {
-                    const selected = isSelected(rowIndex, colIndex);
-                    return (
-                      <button
-                        key={tile.id}
-                        onClick={() => handleTileClick(rowIndex, colIndex)}
-                        disabled={isAnimating}
-                        className={`
-                          aspect-square rounded-lg overflow-hidden
-                          transition-all duration-200 ease-out
-                          hover:scale-110 active:scale-95
-                          ${selected ? 'ring-4 ring-yellow-400 scale-110 shadow-lg shadow-yellow-400/50' : ''}
-                          ${isAnimating ? 'pointer-events-none opacity-90' : 'cursor-pointer'}
-                          bg-black/40
-                        `}
-                        style={{
-                          width: '100%',
-                          maxWidth: '60px',
-                        }}
-                      >
-                        <img
-                          src={getTileImage(tile.type)}
-                          alt={`Stone ${tile.type}`}
-                          className="w-full h-full object-contain"
-                          draggable={false}
-                        />
-                      </button>
-                    );
-                  })
-                )}
+                <Suspense fallback={
+                  <div className="w-full h-full flex items-center justify-center text-white">
+                    Loading 3D board...
+                  </div>
+                }>
+                  <StoneMatch3DBoard
+                    board={board}
+                    selectedTile={selectedTile}
+                    onTileClick={handleTileClick}
+                    isAnimating={isAnimating}
+                  />
+                </Suspense>
               </div>
             </CardContent>
           </Card>
@@ -139,24 +97,32 @@ export default function GamePage() {
               <CardContent>
                 <ul className="space-y-2 text-white/90 text-sm">
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">1.</span>
+                    <span className="text-yellow-400 font-bold">•</span>
+                    <span>Each tile has exactly one stone</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-400 font-bold">•</span>
                     <span>Click a stone to select it</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">2.</span>
+                    <span className="text-yellow-400 font-bold">•</span>
                     <span>Click an adjacent stone to swap</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">3.</span>
+                    <span className="text-yellow-400 font-bold">•</span>
                     <span>Match 3+ stones of the same color</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">4.</span>
+                    <span className="text-yellow-400 font-bold">•</span>
                     <span>Each stone cleared = 10 points</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">5.</span>
+                    <span className="text-yellow-400 font-bold">•</span>
                     <span>Chain reactions score bonus points!</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-400 font-bold">•</span>
+                    <span>Drag to rotate the 3D view</span>
                   </li>
                 </ul>
               </CardContent>

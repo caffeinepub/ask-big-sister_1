@@ -1,38 +1,68 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "2D match game project",
-  "architectural_notes": [],
+  "summary": "3D match-3 style stone tile game where each tile holds a single stone and matches are made by grouping three stones of the same color.",
+  "architectural_notes": [
+    "Core rules: each tile contains exactly one stone; matches are three stones of the same color (three-of-a-kind)."
+  ],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Seamless stone tile texture, neutral gray, subtle roughness (stone-tile-texture.dim_1024x1024.png)\n- Seamless stone texture for colored stones with neutral lighting (stone-texture-base.dim_1024x1024.png)",
   "existing_features": [
     {
-      "id": "feature-stabilize-the-match-3-game-state-updates-so-rapid-user-clicks-cannot-produce-inconsistent-board-state-e-g-swaps-applied-to-a-stale-board-and-ensure-the-board-selection-animation-state-transitions-are-deterministic-and-correct",
-      "title": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
+      "id": "feature-update-the-stone-match-gameplay-rules-to-explicitly-enforce-that-each-board-cell-tile-contains-exactly-one-stone-at-all-times-and-that-matches-are-formed-only-by-stones-of-the-same-color-in-groups-of-three-or-more-match-3",
+      "title": "Update the Stone Match gameplay rules to explicitly enforce that each board cell (tile) contains exactly one stone at all times, and that matches are formed only by stones of the same color in groups of three-or-more (match-3).",
       "reqIds": [
-        "REQ-1"
+        "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-match-3-scoring-and-match-accounting-so-cleared-tiles-are-counted-correctly-no-double-counting-and-no-under-counting-for-overlapping-match-shapes-and-the-displayed-score-reliably-matches-the-number-of-tiles-actually-cleared-across-the-initial-match-and-all-cascades",
-      "title": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
+      "id": "feature-convert-the-stone-match-board-rendering-to-a-real-time-3d-presentation-using-three-js-via-react-three-fiber-render-an-8x8-board-with-a-visible-3d-tile-for-each-grid-cell-and-a-single-3d-stone-on-top-of-each-tile-with-stone-appearance-material-color-derived-from-the-existing-tile-type-color",
+      "title": "Convert the Stone Match board rendering to a real-time 3D presentation using Three.js via React Three Fiber: render an 8x8 board with a visible 3D tile for each grid cell and a single 3D stone on top of each tile, with stone appearance (material/color) derived from the existing tile type/color.",
       "reqIds": [
-        "REQ-2"
+        "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-harden-the-match-3-render-path-to-prevent-invalid-tile-types-from-being-rendered-e-g-temporary-cleared-markers-and-ensure-tile-images-always-resolve-to-a-valid-asset-throughout-gameplay",
-      "title": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
+      "id": "feature-add-3d-interaction-feedback-and-basic-animation-polish-for-the-3d-stone-match-scene-indicate-selected-stone-tile-in-3d-and-animate-swaps-and-clears-cascades-so-state-changes-are-visually-understandable-while-preventing-input-during-animation-consistent-with-the-existing-isanimating-lockout",
+      "title": "Add 3D interaction feedback and basic animation polish for the 3D Stone Match scene: indicate selected stone/tile in 3D, and animate swaps and clears/cascades so state changes are visually understandable while preventing input during animation (consistent with the existing isAnimating lockout).",
       "reqIds": [
-        "REQ-3"
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-keep-the-existing-2d-game-ui-shell-score-controls-instructions-background-but-replace-the-2d-grid-of-images-board-area-with-the-3d-board-view-ensuring-it-remains-responsive-and-does-not-overflow-on-small-screens",
+      "title": "Keep the existing 2D game UI shell (score, controls, instructions, background) but replace the 2D grid-of-images board area with the 3D board view, ensuring it remains responsive and does not overflow on small screens.",
+      "reqIds": [
+        "REQ-7"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "gameProjectType": "2d",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Convert the game to a 3D presentation (3D board/tiles/stones).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Enforce rule: only one stone can occupy each tile.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement matching rule: match three stones of the same color (three-of-a-kind).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "3d",
   "projectName": "Stone Match",
   "clarification_mode": "instant",
   "clarification_rounds": 0

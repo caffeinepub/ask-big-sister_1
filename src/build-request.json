@@ -1,76 +1,110 @@
 {
   "kind": "build_request",
-  "title": "Fix Stone Match 2D match-3 gameplay issues",
+  "title": "Convert Stone Match board to 3D and enforce one-stone-per-tile match-3 rules",
   "projectName": "Stone Match",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
+      "id": "REQ-4",
+      "text": "Update the Stone Match gameplay rules to explicitly enforce that each board cell (tile) contains exactly one stone at all times, and that matches are formed only by stones of the same color in groups of three-or-more (match-3).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Can you fix the 2D match game?"
+          "Make the stone's only one per tile, matching the stone's per same color,  make it 3D and only one stone's for each tile to be matched three of a kind."
         ]
       },
       "acceptanceCriteria": [
-        "Repeated rapid clicking during normal play does not cause duplicated/ignored swaps, broken selection state, or a frozen isAnimating state.",
-        "After any completed move (including cascades), the rendered board matches the latest computed board state and the selected tile is cleared.",
-        "No React console errors occur during normal play (including rapid interaction)."
+        "The in-memory board representation guarantees a single stone per (row,col) position (no stacking/multiple occupancy).",
+        "A swap only clears stones when it creates a contiguous horizontal or vertical match of 3 or more stones of the same color.",
+        "User-facing help text on the game screen describes the rule as matching 3 (or more) stones of the same color."
       ]
     },
     {
-      "id": "REQ-2",
-      "text": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
+      "id": "REQ-5",
+      "text": "Convert the Stone Match board rendering to a real-time 3D presentation using Three.js via React Three Fiber: render an 8x8 board with a visible 3D tile for each grid cell and a single 3D stone on top of each tile, with stone appearance (material/color) derived from the existing tile type/color.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Can you fix the 2D match game?"
+          "make it 3D"
         ]
       },
       "acceptanceCriteria": [
-        "Score increments by exactly 10 points per unique tile cleared across the full move resolution (initial clear + cascades).",
-        "Overlapping match patterns (e.g., T/L shapes where a tile participates in both a horizontal and vertical match) are counted once per cleared tile.",
-        "Score never decreases and never increments when a swap is rejected as invalid."
+        "The /game page renders a 3D scene (Canvas) with a clearly 3D board and stones (perspective, lighting, and depth).",
+        "Each logical tile on the board is represented by exactly one 3D stone mesh positioned over its tile.",
+        "Stone colors in 3D are consistent with the existing tile type/color mapping used by the match logic.",
+        "Clicking/selecting and swapping stones remains functional using the existing match-3 interaction model (select stone, then select adjacent stone to swap)."
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
+      "id": "REQ-6",
+      "text": "Add 3D interaction feedback and basic animation polish for the 3D Stone Match scene: indicate selected stone/tile in 3D, and animate swaps and clears/cascades so state changes are visually understandable while preventing input during animation (consistent with the existing isAnimating lockout).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Can you fix the 2D match game?"
+          "make it 3D"
         ]
       },
       "acceptanceCriteria": [
-        "The game never attempts to render an out-of-range TILE_IMAGES index (no broken image icons due to invalid tile.type).",
-        "During match resolution, the UI either avoids rendering cleared placeholders or safely renders a defined fallback for any transient state.",
-        "Gameplay continues normally after many moves without visual corruption."
+        "A selected stone/tile is visually highlighted in 3D (e.g., outline, glow, scale, or ring) and updates correctly as the selection changes/clears.",
+        "When a valid swap occurs, stones animate to their new positions rather than instantly teleporting (within a short, consistent duration).",
+        "When matches clear and the board refills/cascades, the 3D scene visually reflects the change with a minimal clear/refill animation (e.g., scale down/up or fade).",
+        "User input is ignored/disabled while swap/cascade animations are running, and re-enabled once the board is stable."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Keep the existing 2D game UI shell (score, controls, instructions, background) but replace the 2D grid-of-images board area with the 3D board view, ensuring it remains responsive and does not overflow on small screens.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "make it 3D"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The score panel, New Game control, and How to Play section remain visible and functional.",
+        "The 3D board fits within the prior board container area and scales down appropriately on smaller viewports.",
+        "No broken image references remain for stones in the /game board area after the 3D view is introduced."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/components/ui (shadcn components are read-only).",
-    "Do not edit any files listed in frontend.immutablePaths (compose around them instead).",
-    "Keep all game logic in the existing Match-3 module structure under frontend/src/game/match3/ (no new backend dependencies)."
+    "Do not modify any files under frontend/immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Backend Motoko canister functionality is out of scope unless strictly required; keep all match-3 logic and 3D rendering on the frontend.",
+    "Respect the single-actor backend architecture; do not introduce additional backend services."
   ],
   "nonGoals": [
-    "Adding new game modes, power-ups, timers, levels, or monetization.",
-    "Changing Internet Identity authentication, profiles, or wallet features.",
-    "Introducing backend persistence for game progress or score."
+    "Adding multiplayer or real-time features (no WebSockets/real-time sync).",
+    "Adding third-party authentication providers (Internet Identity only).",
+    "Introducing external databases or non-Motoko backend components.",
+    "Redesigning non-game pages (e.g., wallet/profile flows) beyond any necessary styling consistency adjustments."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Seamless stone tile texture, neutral gray, subtle roughness (stone-tile-texture.dim_1024x1024.png)",
+      "Seamless stone texture for colored stones with neutral lighting (stone-texture-base.dim_1024x1024.png)"
+    ],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

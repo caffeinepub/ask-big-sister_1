@@ -17,7 +17,7 @@ function randomTileType(): TileType {
   return Math.floor(Math.random() * TILE_TYPES) as TileType;
 }
 
-// Initialize board without immediate matches
+// Initialize board without immediate matches - ensures one stone per tile
 export function initializeBoard(): Board {
   const board: Board = [];
   
@@ -34,6 +34,11 @@ export function initializeBoard(): Board {
       
       board[row][col] = createTile(type);
     }
+  }
+  
+  // Runtime assertion: verify board is 8x8 with exactly one tile per cell
+  if (board.length !== GRID_SIZE || board.some(row => row.length !== GRID_SIZE)) {
+    throw new Error('Board initialization failed: invalid dimensions');
   }
   
   return board;
@@ -72,12 +77,12 @@ export function swapTiles(board: Board, pos1: Position, pos2: Position): Board {
   return newBoard;
 }
 
-// Find all matches on the board
+// Find all matches on the board (only contiguous horizontal/vertical 3+ matches)
 export function findMatches(board: Board): Match[] {
   const matches: Match[] = [];
   const matched = new Set<string>();
   
-  // Check horizontal matches
+  // Check horizontal matches (3 or more in a row)
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE - 2; col++) {
       const type = board[row][col].type;
@@ -105,7 +110,7 @@ export function findMatches(board: Board): Match[] {
     }
   }
   
-  // Check vertical matches
+  // Check vertical matches (3 or more in a column)
   for (let col = 0; col < GRID_SIZE; col++) {
     for (let row = 0; row < GRID_SIZE - 2; row++) {
       const type = board[row][col].type;
@@ -189,7 +194,7 @@ export function applyGravityAndRefill(board: Board, clearedPositions: Position[]
   return newBoard;
 }
 
-// Attempt a swap and return result
+// Attempt a swap and return result (only succeeds if it creates a match of 3+)
 export function attemptSwap(board: Board, pos1: Position, pos2: Position): SwapResult {
   if (!areAdjacent(pos1, pos2)) {
     return { success: false, matches: [] };

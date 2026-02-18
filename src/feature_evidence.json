@@ -2,49 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-stabilize-the-match-3-game-state-updates-so-rapid-user-clicks-cannot-produce-inconsistent-board-state-e-g-swaps-applied-to-a-stale-board-and-ensure-the-board-selection-animation-state-transitions-are-deterministic-and-correct",
-      "featureTitle": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
-      "files": [
-        "frontend/src/game/match3/engine.ts",
-        "frontend/src/game/match3/useMatch3Game.ts",
-        "frontend/src/pages/GamePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-fix-match-3-scoring-and-match-accounting-so-cleared-tiles-are-counted-correctly-no-double-counting-and-no-under-counting-for-overlapping-match-shapes-and-the-displayed-score-reliably-matches-the-number-of-tiles-actually-cleared-across-the-initial-match-and-all-cascades",
-      "featureTitle": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
-      "files": [
-        "frontend/src/game/match3/engine.ts",
-        "frontend/src/game/match3/useMatch3Game.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-harden-the-match-3-render-path-to-prevent-invalid-tile-types-from-being-rendered-e-g-temporary-cleared-markers-and-ensure-tile-images-always-resolve-to-a-valid-asset-throughout-gameplay",
-      "featureTitle": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
+      "featureId": "feature-update-the-stone-match-gameplay-rules-to-explicitly-enforce-that-each-board-cell-tile-contains-exactly-one-stone-at-all-times-and-that-matches-are-formed-only-by-stones-of-the-same-color-in-groups-of-three-or-more-match-3",
+      "featureTitle": "Update the Stone Match gameplay rules to explicitly enforce that each board cell (tile) contains exactly one stone at all times, and that matches are formed only by stones of the same color in groups of three-or-more (match-3).",
       "files": [
         "frontend/src/game/match3/engine.ts",
         "frontend/src/game/match3/types.ts",
@@ -59,7 +18,69 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-3"
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-convert-the-stone-match-board-rendering-to-a-real-time-3d-presentation-using-three-js-via-react-three-fiber-render-an-8x8-board-with-a-visible-3d-tile-for-each-grid-cell-and-a-single-3d-stone-on-top-of-each-tile-with-stone-appearance-material-color-derived-from-the-existing-tile-type-color",
+      "featureTitle": "Convert the Stone Match board rendering to a real-time 3D presentation using Three.js via React Three Fiber: render an 8x8 board with a visible 3D tile for each grid cell and a single 3D stone on top of each tile, with stone appearance (material/color) derived from the existing tile type/color.",
+      "files": [
+        "frontend/src/game/three/StoneMatch3DBoard.tsx",
+        "frontend/src/game/three/layout.ts",
+        "frontend/src/game/three/materials.ts",
+        "frontend/src/pages/GamePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-3d-interaction-feedback-and-basic-animation-polish-for-the-3d-stone-match-scene-indicate-selected-stone-tile-in-3d-and-animate-swaps-and-clears-cascades-so-state-changes-are-visually-understandable-while-preventing-input-during-animation-consistent-with-the-existing-isanimating-lockout",
+      "featureTitle": "Add 3D interaction feedback and basic animation polish for the 3D Stone Match scene: indicate selected stone/tile in 3D, and animate swaps and clears/cascades so state changes are visually understandable while preventing input during animation (consistent with the existing isAnimating lockout).",
+      "files": [
+        "frontend/src/game/match3/useMatch3Game.ts",
+        "frontend/src/game/three/StoneMatch3DBoard.tsx",
+        "frontend/src/game/three/useStoneAnimations.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-keep-the-existing-2d-game-ui-shell-score-controls-instructions-background-but-replace-the-2d-grid-of-images-board-area-with-the-3d-board-view-ensuring-it-remains-responsive-and-does-not-overflow-on-small-screens",
+      "featureTitle": "Keep the existing 2D game UI shell (score, controls, instructions, background) but replace the 2D grid-of-images board area with the 3D board view, ensuring it remains responsive and does not overflow on small screens.",
+      "files": [
+        "frontend/src/pages/GamePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
       ],
       "confidence": "high"
     }

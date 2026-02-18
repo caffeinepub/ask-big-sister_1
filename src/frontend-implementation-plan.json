@@ -1,78 +1,121 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Stone Match: Deterministic Match-3 state, scoring, and safe rendering",
+  "title": "Stone Match: 3D board rendering with strict one-stone-per-tile match-3 rules",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Make Match-3 move resolution deterministic and immune to rapid clicks by eliminating stale state usage and enforcing a single in-flight resolution state machine.",
+      "id": "REQ-4",
+      "summary": "Enforce one-stone-per-tile board representation and match-3-only clearing rules, and describe the rule in-game.",
       "acceptanceCriteria": [
-        "Repeated rapid clicking during normal play does not cause duplicated/ignored swaps, broken selection state, or a frozen isAnimating state.",
-        "After any completed move (including cascades), the rendered board matches the latest computed board state and the selected tile is cleared.",
-        "No React console errors occur during normal play (including rapid interaction)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/match3/useMatch3Game.ts",
-          "operation": "modify",
-          "description": "Refactor the hook to avoid stale `board` closures during swaps (use functional state updates and/or refs for latest board), serialize interactions so only one move resolves at a time, and ensure `selectedTile`/`isAnimating` transitions always complete (including early returns and invalid swaps)."
-        },
-        {
-          "path": "frontend/src/game/match3/engine.ts",
-          "operation": "modify",
-          "description": "Adjust the engine APIs as needed to support a single deterministic move resolution flow (swap -> resolve clears/cascades -> final board) that the hook can call without relying on timeouts and intermediate stale board variables."
-        },
-        {
-          "path": "frontend/src/pages/GamePage.tsx",
-          "operation": "modify",
-          "description": "Align the UI interaction wiring with the deterministic hook behavior (ensure tile clicks delegate only to the hook, and disabling/pointer-blocking during animation does not leave the board stuck or selection uncleared)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Fix scoring to count exactly 10 points per unique cleared tile per full move (initial clear + cascades), with overlap-safe accounting and no score changes on invalid swaps.",
-      "acceptanceCriteria": [
-        "Score increments by exactly 10 points per unique tile cleared across the full move resolution (initial clear + cascades).",
-        "Overlapping match patterns (e.g., T/L shapes where a tile participates in both a horizontal and vertical match) are counted once per cleared tile.",
-        "Score never decreases and never increments when a swap is rejected as invalid."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/match3/engine.ts",
-          "operation": "modify",
-          "description": "Update match accounting to return (or make computable) the set/count of uniquely cleared tiles per resolution step using stable tile identity (e.g., tile.id) so overlaps are counted once and cascades aggregate correctly."
-        },
-        {
-          "path": "frontend/src/game/match3/useMatch3Game.ts",
-          "operation": "modify",
-          "description": "Compute score increments using the engine-provided unique cleared tile count across the full move resolution; ensure invalid swaps return without mutating score and that score updates are derived from the resolved move result only."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Prevent invalid/transient tile types from reaching the render path and ensure tile images always resolve to a valid asset or defined fallback during gameplay.",
-      "acceptanceCriteria": [
-        "The game never attempts to render an out-of-range TILE_IMAGES index (no broken image icons due to invalid tile.type).",
-        "During match resolution, the UI either avoids rendering cleared placeholders or safely renders a defined fallback for any transient state.",
-        "Gameplay continues normally after many moves without visual corruption."
+        "The in-memory board representation guarantees a single stone per (row,col) position (no stacking/multiple occupancy).",
+        "A swap only clears stones when it creates a contiguous horizontal or vertical match of 3 or more stones of the same color.",
+        "User-facing help text on the game screen describes the rule as matching 3 (or more) stones of the same color."
       ],
       "file_operations": [
         {
           "path": "frontend/src/game/match3/types.ts",
           "operation": "modify",
-          "description": "Tighten and/or extend Match-3 types to represent any transient cleared state safely (instead of relying on an untyped sentinel), enabling compile-time protection against invalid `tile.type` rendering."
+          "description": "Clarify/strengthen board invariants in types/comments so the Board remains a strict 2D grid (exactly one Tile per [row][col]) suitable for 3D rendering."
         },
         {
           "path": "frontend/src/game/match3/engine.ts",
           "operation": "modify",
-          "description": "Remove unsafe mutation that can introduce invalid tile types into live board objects, and ensure cleared/transient states are represented in a way that the UI can safely handle (no out-of-range tile.type values)."
+          "description": "Add lightweight runtime assertions/helpers to validate the board remains an 8x8 grid with exactly one Tile per cell, and keep swap resolution limited to contiguous horizontal/vertical 3+ matches only."
         },
         {
           "path": "frontend/src/pages/GamePage.tsx",
           "operation": "modify",
-          "description": "Harden tile rendering by guarding TILE_IMAGES access (render nothing or a defined fallback when a cell is cleared/transient) so the UI never indexes TILE_IMAGES with an invalid value."
+          "description": "Update the on-screen instructions/help text to explicitly mention 'one stone per tile' and 'match 3+ stones of the same color' while keeping the existing UI shell."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Replace 2D grid rendering with a React Three Fiber 3D scene showing an 8x8 board and one 3D stone per tile, preserving click-to-select and adjacent swap interaction.",
+      "acceptanceCriteria": [
+        "The /game page renders a 3D scene (Canvas) with a clearly 3D board and stones (perspective, lighting, and depth).",
+        "Each logical tile on the board is represented by exactly one 3D stone mesh positioned over its tile.",
+        "Stone colors in 3D are consistent with the existing tile type/color mapping used by the match logic.",
+        "Clicking/selecting and swapping stones remains functional using the existing match-3 interaction model (select stone, then select adjacent stone to swap)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Replace the 2D grid-of-images board area with a 3D board view component while preserving score/controls/instructions and keeping selection + swap behavior wired to useMatch3Game()."
+        },
+        {
+          "path": "frontend/src/game/three/StoneMatch3DBoard.tsx",
+          "operation": "create",
+          "description": "Create a React Three Fiber board renderer that displays an 8x8 grid of 3D tiles and exactly one 3D stone mesh per logical Tile, using textures from frontend/public/assets/generated/stone-tile-texture.dim_1024x1024.png and frontend/public/assets/generated/stone-texture-base.dim_1024x1024.png and tinting stone materials by TileType."
+        },
+        {
+          "path": "frontend/src/game/three/materials.ts",
+          "operation": "create",
+          "description": "Centralize TileType->color/material mapping for the 3D scene to ensure visual colors stay consistent with match-3 logic and any existing type ordering."
+        },
+        {
+          "path": "frontend/src/game/three/layout.ts",
+          "operation": "create",
+          "description": "Add shared constants/helpers for mapping (row,col) to 3D world positions (spacing, centering, heights) so each tile and its single stone are placed consistently."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-tile-texture.dim_1024x1024.png",
+          "operation": "create",
+          "description": "Add the generated seamless stone tile texture asset at this exact path and wire it for 3D tile materials in the 3D board."
+        },
+        {
+          "path": "frontend/public/assets/generated/stone-texture-base.dim_1024x1024.png",
+          "operation": "create",
+          "description": "Add the generated seamless stone base texture asset at this exact path and wire it for 3D stone materials in the 3D board."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Add 3D selection highlighting and basic swap/clear/cascade animations while preventing input during animation using the existing isAnimating lockout.",
+      "acceptanceCriteria": [
+        "A selected stone/tile is visually highlighted in 3D (e.g., outline, glow, scale, or ring) and updates correctly as the selection changes/clears.",
+        "When a valid swap occurs, stones animate to their new positions rather than instantly teleporting (within a short, consistent duration).",
+        "When matches clear and the board refills/cascades, the 3D scene visually reflects the change with a minimal clear/refill animation (e.g., scale down/up or fade).",
+        "User input is ignored/disabled while swap/cascade animations are running, and re-enabled once the board is stable."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/three/StoneMatch3DBoard.tsx",
+          "operation": "modify",
+          "description": "Implement 3D interaction feedback (selected highlight) and ensure pointer interaction is disabled when isAnimating is true; keep selection + swap calls routed through the existing selectTile() API."
+        },
+        {
+          "path": "frontend/src/game/three/useStoneAnimations.ts",
+          "operation": "create",
+          "description": "Add a small animation controller/hook that animates stone transforms based on board changes (swap motion, clear scale/fade, and refill/cascade settle) and exposes an animation-in-progress signal that respects the existing isAnimating lockout semantics."
+        },
+        {
+          "path": "frontend/src/game/match3/useMatch3Game.ts",
+          "operation": "modify",
+          "description": "Coordinate game state transitions with 3D animation timing so swaps/cascades are visually understandable, and ensure input remains locked out while animations are running (consistent with existing isAnimating behavior)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Keep the existing 2D game UI shell but swap in the responsive 3D board view without overflow and without any remaining broken image references for the board.",
+      "acceptanceCriteria": [
+        "The score panel, New Game control, and How to Play section remain visible and functional.",
+        "The 3D board fits within the prior board container area and scales down appropriately on smaller viewports.",
+        "No broken image references remain for stones in the /game board area after the 3D view is introduced."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Preserve the existing page layout (background, score card, controls, instructions) and replace only the board area with the 3D board container sized to the prior max width and responsive on small screens; remove the board-area <img>-based stone rendering."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add/adjust minimal global styles (using existing entry point) to ensure the 3D Canvas container is responsive (square aspect, max width constraints) and does not overflow within the existing Card layout."
         }
       ]
     }
