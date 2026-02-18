@@ -1,3 +1,4 @@
+import { useAuth } from '../hooks/useAuth';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from '../hooks/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,11 +15,11 @@ import { Wallet, User, LogOut, Gamepad2 } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 export default function Header() {
-  const { login, clear, loginStatus, identity } = useInternetIdentity();
+  const { isAuthenticated } = useAuth();
+  const { login, clear, loginStatus } = useInternetIdentity();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   
-  const isAuthenticated = !!identity;
   const disabled = loginStatus === 'logging-in';
   
   const { data: userProfile } = useGetCallerUserProfile();

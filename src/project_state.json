@@ -1,69 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "3D match-3 style stone tile game where each tile holds a single stone and matches are made by grouping three stones of the same color.",
-  "architectural_notes": [
-    "Core rules: each tile contains exactly one stone; matches are three stones of the same color (three-of-a-kind)."
+  "summary": "3D matching game (Stone Match) with login functionality; current work focuses on fixing login and in-game glitching issues.",
+  "architectural_notes": [],
+  "known_issues": [
+    "Login issue preventing or disrupting user access/authentication.",
+    "Glitching/visual or gameplay issue occurring during Stone Match 3D matching gameplay."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Seamless stone tile texture, neutral gray, subtle roughness (stone-tile-texture.dim_1024x1024.png)\n- Seamless stone texture for colored stones with neutral lighting (stone-texture-base.dim_1024x1024.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-update-the-stone-match-gameplay-rules-to-explicitly-enforce-that-each-board-cell-tile-contains-exactly-one-stone-at-all-times-and-that-matches-are-formed-only-by-stones-of-the-same-color-in-groups-of-three-or-more-match-3",
-      "title": "Update the Stone Match gameplay rules to explicitly enforce that each board cell (tile) contains exactly one stone at all times, and that matches are formed only by stones of the same color in groups of three-or-more (match-3).",
+      "id": "feature-fix-the-authentication-gating-so-the-app-consistently-treats-a-user-as-logged-in-when-a-valid-internet-identity-is-already-loaded-from-storage-without-requiring-loginstatus-success-update-frontend-src-app-tsx-and-any-related-ui-logic-to-use-a-single-correct-definition-of-authenticated-based-on-the-presence-of-a-non-anonymous-identity-and-ensure-routing-profile-gate-behavior-works-after-page-reload",
+      "title": "Fix the authentication gating so the app consistently treats a user as logged in when a valid Internet Identity is already loaded from storage (without requiring `loginStatus === \"success\"`). Update `frontend/src/App.tsx` and any related UI logic to use a single, correct definition of “authenticated” based on the presence of a non-anonymous identity, and ensure routing/profile-gate behavior works after page reload.",
       "reqIds": [
-        "REQ-4"
+        "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-convert-the-stone-match-board-rendering-to-a-real-time-3d-presentation-using-three-js-via-react-three-fiber-render-an-8x8-board-with-a-visible-3d-tile-for-each-grid-cell-and-a-single-3d-stone-on-top-of-each-tile-with-stone-appearance-material-color-derived-from-the-existing-tile-type-color",
-      "title": "Convert the Stone Match board rendering to a real-time 3D presentation using Three.js via React Three Fiber: render an 8x8 board with a visible 3D tile for each grid cell and a single 3D stone on top of each tile, with stone appearance (material/color) derived from the existing tile type/color.",
+      "id": "feature-prevent-authenticated-profile-react-query-calls-from-running-in-an-unauthenticated-anonymous-state-and-handle-backend-authorization-traps-cleanly-update-frontend-src-hooks-usequeries-ts-so-usegetcalleruserprofile-and-wallet-related-queries-mutations-only-execute-when-the-user-is-truly-authenticated-and-ensure-errors-caused-by-missing-auth-e-g-unauthorized-traps-do-not-create-a-broken-login-loop-or-persistent-error-state",
+      "title": "Prevent authenticated-profile React Query calls from running in an unauthenticated/anonymous state and handle backend authorization traps cleanly. Update `frontend/src/hooks/useQueries.ts` so `useGetCallerUserProfile` and wallet-related queries/mutations only execute when the user is truly authenticated, and ensure errors caused by missing auth (e.g., unauthorized traps) do not create a broken login loop or persistent error state.",
       "reqIds": [
-        "REQ-5"
+        "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-3d-interaction-feedback-and-basic-animation-polish-for-the-3d-stone-match-scene-indicate-selected-stone-tile-in-3d-and-animate-swaps-and-clears-cascades-so-state-changes-are-visually-understandable-while-preventing-input-during-animation-consistent-with-the-existing-isanimating-lockout",
-      "title": "Add 3D interaction feedback and basic animation polish for the 3D Stone Match scene: indicate selected stone/tile in 3D, and animate swaps and clears/cascades so state changes are visually understandable while preventing input during animation (consistent with the existing isAnimating lockout).",
+      "id": "feature-fix-the-stone-match-3d-gameplay-glitching-by-stabilizing-stone-rendering-and-state-transitions-during-swaps-cascades-in-frontend-src-game-three-stonematch3dboard-tsx-and-related-match-3-state-management-eliminate-visual-flicker-jumping-caused-by-remounting-stones-e-g-unstable-react-keys-tied-to-changing-tile-ids-and-ensure-interaction-is-correctly-disabled-while-animations-state-transitions-are-in-progress",
+      "title": "Fix the Stone Match 3D gameplay “glitching” by stabilizing stone rendering and state transitions during swaps/cascades. In `frontend/src/game/three/StoneMatch3DBoard.tsx` and related match-3 state management, eliminate visual flicker/jumping caused by remounting stones (e.g., unstable React keys tied to changing tile IDs) and ensure interaction is correctly disabled while animations/state transitions are in progress.",
       "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-keep-the-existing-2d-game-ui-shell-score-controls-instructions-background-but-replace-the-2d-grid-of-images-board-area-with-the-3d-board-view-ensuring-it-remains-responsive-and-does-not-overflow-on-small-screens",
-      "title": "Keep the existing 2D game UI shell (score, controls, instructions, background) but replace the 2D grid-of-images board area with the 3D board view, ensuring it remains responsive and does not overflow on small screens.",
-      "reqIds": [
-        "REQ-7"
+        "REQ-3"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Convert the game to a 3D presentation (3D board/tiles/stones).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Enforce rule: only one stone can occupy each tile.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Implement matching rule: match three stones of the same color (three-of-a-kind).",
-      "reqIds": [],
-      "status": "pending"
-    }
-  ],
+  "new_feature_requests": [],
   "gameProjectType": "3d",
-  "projectName": "Stone Match",
+  "projectName": "Stone Match 3D",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

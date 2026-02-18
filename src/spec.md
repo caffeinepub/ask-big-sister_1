@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Convert the Stone Match board area to a 3D game board while enforcing strict one-stone-per-tile, match-3-only rules.
+**Goal:** Fix Internet Identity login state inconsistencies after reload and eliminate Stone Match 3D board “glitching” during swaps/cascades.
 
 **Planned changes:**
-- Update match-3 board/state logic to guarantee exactly one stone per tile and only clear contiguous horizontal/vertical matches of 3+ same-color stones.
-- Replace the 2D grid-of-images board rendering on `/game` with a real-time 3D board using Three.js via React Three Fiber (8x8 tiles with one 3D stone per tile, colors mapped to existing stone/tile types).
-- Add 3D interaction feedback (selected highlight) and basic animations for swaps and clears/cascades, disabling input while animations run.
-- Keep the existing 2D UI shell (score, New Game, instructions, background) and ensure the embedded 3D board is responsive and does not overflow on small screens.
+- Update `frontend/src/App.tsx` (and related UI/routing logic) to use a single, correct “authenticated” definition based on a non-anonymous identity, so login state persists correctly across page reloads while keeping the profile setup gate behavior.
+- Update `frontend/src/hooks/useQueries.ts` to only run profile/wallet React Query calls when truly authenticated; handle unauthorized/unauthenticated errors cleanly and clear protected cached data on logout to avoid loops or persistent error states.
+- Update `frontend/src/game/three/StoneMatch3DBoard.tsx` (and related match-3 state management) to stabilize stone rendering during swaps/cascades (avoid remounting from unstable keys) and disable user input while moves are animating/resolving.
 
-**User-visible outcome:** On the game page, players see and interact with a 3D 8x8 Stone Match board where each tile holds one stone, swaps animate, matches only clear for 3+ same-color lines, and the existing score/controls/instructions remain available.
+**User-visible outcome:** After logging in, refreshing the page keeps the user recognized as logged in; profile setup gating still works; unauthenticated users no longer see repeated auth-related query errors; and the Stone Match 3D board no longer flickers/duplicates/teleports during cascades, with inputs ignored while animations resolve.

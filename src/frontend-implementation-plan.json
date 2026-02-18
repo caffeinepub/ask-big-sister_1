@@ -1,121 +1,78 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Stone Match: 3D board rendering with strict one-stone-per-tile match-3 rules",
+  "title": "Fix II auth state mismatch and stabilize Stone Match 3D rendering",
   "requirements": [
     {
-      "id": "REQ-4",
-      "summary": "Enforce one-stone-per-tile board representation and match-3-only clearing rules, and describe the rule in-game.",
+      "id": "REQ-1",
+      "summary": "Unify “authenticated” detection (non-anonymous identity) and stabilize routing/profile-gate behavior across reloads without router re-creation glitches.",
       "acceptanceCriteria": [
-        "The in-memory board representation guarantees a single stone per (row,col) position (no stacking/multiple occupancy).",
-        "A swap only clears stones when it creates a contiguous horizontal or vertical match of 3 or more stones of the same color.",
-        "User-facing help text on the game screen describes the rule as matching 3 (or more) stones of the same color."
+        "After a successful Internet Identity login, refreshing the page keeps the user recognized as logged in (no unexpected return to logged-out state).",
+        "The profile setup gate still appears for authenticated users who do not yet have a profile, including after a page reload.",
+        "No route tree / router re-creation issues occur during auth state transitions (navigation remains stable across login/logout/reload)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/match3/types.ts",
-          "operation": "modify",
-          "description": "Clarify/strengthen board invariants in types/comments so the Board remains a strict 2D grid (exactly one Tile per [row][col]) suitable for 3D rendering."
+          "path": "frontend/src/hooks/useAuth.ts",
+          "operation": "create",
+          "description": "Add a small auth-state helper hook that derives a single, correct `isAuthenticated` boolean from `useInternetIdentity()` based on presence of a non-anonymous identity (do not depend on `loginStatus === \"success\"`). This will be consumed by routing/UI gates. (Uses selected component: authorization — follow its frontend guidance for treating anonymous principals as guests. Verify the component's usage instructions before implementing.)"
         },
         {
-          "path": "frontend/src/game/match3/engine.ts",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add lightweight runtime assertions/helpers to validate the board remains an 8x8 grid with exactly one Tile per cell, and keep swap resolution limited to contiguous horizontal/vertical 3+ matches only."
+          "description": "Refactor app composition so the router/routeTree are created once (module-scope or memoized) and are not recreated during auth/profile-gate transitions; move profile-setup gating into a stable routed layout (e.g., in `Layout` render `ProfileSetup` instead of `Outlet` when `showProfileSetup` is true) while using `useAuth()` for consistent authentication detection. Ensure the profile gate logic uses `isAuthenticated && !profileLoading && isFetched && userProfile === null` and remains correct after reload. (Uses selected component: authorization — implement the login/profile-gate behavior per its frontend recommendations. Verify the component's usage instructions before implementing.)"
         },
         {
-          "path": "frontend/src/pages/GamePage.tsx",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Update the on-screen instructions/help text to explicitly mention 'one stone per tile' and 'match 3+ stones of the same color' while keeping the existing UI shell."
+          "description": "Update header auth UI to use the shared `useAuth()` definition (non-anonymous identity) so login/logout state is consistent with app gating; keep logout clearing React Query cache and navigation stable. (Uses selected component: authorization — clear cached application data on logout per guidance. Verify the component's usage instructions before implementing.)"
+        },
+        {
+          "path": "frontend/src/pages/ConnectWallet.tsx",
+          "operation": "modify",
+          "description": "Replace the local `isAuthenticated` check (`loginStatus === \"success\"`) with the shared `useAuth()` check so the wallet page guard works correctly after reload and does not incorrectly treat stored identities as logged-out."
         }
       ]
     },
     {
-      "id": "REQ-5",
-      "summary": "Replace 2D grid rendering with a React Three Fiber 3D scene showing an 8x8 board and one 3D stone per tile, preserving click-to-select and adjacent swap interaction.",
+      "id": "REQ-2",
+      "summary": "Gate profile and wallet React Query operations behind true authentication and handle unauthorized/anonymous errors without loops; clear authenticated caches on logout.",
       "acceptanceCriteria": [
-        "The /game page renders a 3D scene (Canvas) with a clearly 3D board and stones (perspective, lighting, and depth).",
-        "Each logical tile on the board is represented by exactly one 3D stone mesh positioned over its tile.",
-        "Stone colors in 3D are consistent with the existing tile type/color mapping used by the match logic.",
-        "Clicking/selecting and swapping stones remains functional using the existing match-3 interaction model (select stone, then select adjacent stone to swap)."
+        "When not logged in, profile and wallet queries do not spam errors such as \"Actor not available\" or backend \"Unauthorized\" traps.",
+        "After login, profile and wallet queries successfully run and populate UI without requiring a manual refresh.",
+        "After logout, cached authenticated data is cleared and protected queries do not re-run until the next successful login."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/GamePage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Replace the 2D grid-of-images board area with a 3D board view component while preserving score/controls/instructions and keeping selection + swap behavior wired to useMatch3Game()."
+          "description": "Update `useGetCallerUserProfile` and wallet-related queries/mutations to only execute when the user is truly authenticated (use `useAuth()` to drive `enabled`/guards rather than relying on `!!actor`, since an anonymous actor exists). Add clean handling for authorization-trap style errors (e.g., treat as unauthenticated/guest and avoid retries/persistent error state), and ensure cache invalidation/clearing behavior supports logout (do not refetch protected queries when unauthenticated). (Uses selected component: authorization — follow its guidance for preventing profile setup modal flash and handling backend `trap` authorization failures gracefully. Verify the component's usage instructions before implementing.)"
         },
         {
-          "path": "frontend/src/game/three/StoneMatch3DBoard.tsx",
-          "operation": "create",
-          "description": "Create a React Three Fiber board renderer that displays an 8x8 grid of 3D tiles and exactly one 3D stone mesh per logical Tile, using textures from frontend/public/assets/generated/stone-tile-texture.dim_1024x1024.png and frontend/public/assets/generated/stone-texture-base.dim_1024x1024.png and tinting stone materials by TileType."
-        },
-        {
-          "path": "frontend/src/game/three/materials.ts",
-          "operation": "create",
-          "description": "Centralize TileType->color/material mapping for the 3D scene to ensure visual colors stay consistent with match-3 logic and any existing type ordering."
-        },
-        {
-          "path": "frontend/src/game/three/layout.ts",
-          "operation": "create",
-          "description": "Add shared constants/helpers for mapping (row,col) to 3D world positions (spacing, centering, heights) so each tile and its single stone are placed consistently."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-texture.dim_1024x1024.png",
-          "operation": "create",
-          "description": "Add the generated seamless stone tile texture asset at this exact path and wire it for 3D tile materials in the 3D board."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-texture-base.dim_1024x1024.png",
-          "operation": "create",
-          "description": "Add the generated seamless stone base texture asset at this exact path and wire it for 3D stone materials in the 3D board."
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Ensure logout continues to clear cached authenticated data (React Query) and that UI does not immediately re-trigger protected queries while unauthenticated (align with updated query gating). (Uses selected component: authorization — clear all cached application data on logout. Verify the component's usage instructions before implementing.)"
         }
       ]
     },
     {
-      "id": "REQ-6",
-      "summary": "Add 3D selection highlighting and basic swap/clear/cascade animations while preventing input during animation using the existing isAnimating lockout.",
+      "id": "REQ-3",
+      "summary": "Eliminate Stone Match 3D flicker/teleport glitches by using stable rendering keys and ensuring input is disabled during swap/cascade resolution.",
       "acceptanceCriteria": [
-        "A selected stone/tile is visually highlighted in 3D (e.g., outline, glow, scale, or ring) and updates correctly as the selection changes/clears.",
-        "When a valid swap occurs, stones animate to their new positions rather than instantly teleporting (within a short, consistent duration).",
-        "When matches clear and the board refills/cascades, the 3D scene visually reflects the change with a minimal clear/refill animation (e.g., scale down/up or fade).",
-        "User input is ignored/disabled while swap/cascade animations are running, and re-enabled once the board is stable."
+        "During a valid swap and subsequent cascade resolution, stones do not visually flicker, duplicate, or appear to “teleport” due to component remounting.",
+        "Each grid cell always displays exactly one stone throughout gameplay, including during cascades.",
+        "User input is ignored while the game is animating/resolving a move (no double-click swap glitches or selection desync)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/game/three/StoneMatch3DBoard.tsx",
           "operation": "modify",
-          "description": "Implement 3D interaction feedback (selected highlight) and ensure pointer interaction is disabled when isAnimating is true; keep selection + swap calls routed through the existing selectTile() API."
-        },
-        {
-          "path": "frontend/src/game/three/useStoneAnimations.ts",
-          "operation": "create",
-          "description": "Add a small animation controller/hook that animates stone transforms based on board changes (swap motion, clear scale/fade, and refill/cascade settle) and exposes an animation-in-progress signal that respects the existing isAnimating lockout semantics."
+          "description": "Stabilize stone rendering by replacing unstable React keys tied to changing tile IDs (e.g., `key={tile.id}`) with stable per-cell keys (e.g., derived from row/col) so stones do not remount during cascades/refills; additionally ensure pointer interactions remain blocked while `isAnimating` is true (including preventing hover/click side effects)."
         },
         {
           "path": "frontend/src/game/match3/useMatch3Game.ts",
           "operation": "modify",
-          "description": "Coordinate game state transitions with 3D animation timing so swaps/cascades are visually understandable, and ensure input remains locked out while animations are running (consistent with existing isAnimating behavior)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Keep the existing 2D game UI shell but swap in the responsive 3D board view without overflow and without any remaining broken image references for the board.",
-      "acceptanceCriteria": [
-        "The score panel, New Game control, and How to Play section remain visible and functional.",
-        "The 3D board fits within the prior board container area and scales down appropriately on smaller viewports.",
-        "No broken image references remain for stones in the /game board area after the 3D view is introduced."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/GamePage.tsx",
-          "operation": "modify",
-          "description": "Preserve the existing page layout (background, score card, controls, instructions) and replace only the board area with the 3D board container sized to the prior max width and responsive on small screens; remove the board-area <img>-based stone rendering."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add/adjust minimal global styles (using existing entry point) to ensure the 3D Canvas container is responsive (square aspect, max width constraints) and does not overflow within the existing Card layout."
+          "description": "Tighten interaction locking during swap/cascade resolution so clicks are ignored throughout the full resolving window; ensure `isAnimating` is set/cleared in a way that cannot be bypassed by rapid input (keep the ref-based guard correct and aligned with the board's `disabled` behavior)."
         }
       ]
     }

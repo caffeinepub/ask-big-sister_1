@@ -1,19 +1,20 @@
 {
-  "frontend/src/App.tsx": "Main application component with routing setup including the new /game route, profile setup flow, and theme provider integration.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profile management and wallet address CRUD operations with proper cache invalidation and toast notifications.",
+  "frontend/src/App.tsx": "Main application component with stable router created at module scope, profile setup gating in layout, and consistent authentication detection using useAuth hook.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for backend operations with authentication-gated queries, graceful authorization error handling, and proper cache management on logout.",
   "frontend/src/pages/HomePage.tsx": "Landing page with hero section, prominent game feature card with call-to-action, feature cards, and wallet connection section for authenticated users.",
-  "frontend/src/pages/ConnectWallet.tsx": "Complete wallet address management screen with validation, add/edit/remove functionality, and clear user feedback using alerts and dialogs.",
-  "frontend/src/components/Header.tsx": "Application header with logo, navigation including new \"Play Game\" button, and user dropdown menu with wallet and logout functionality.",
+  "frontend/src/pages/ConnectWallet.tsx": "Wallet address management page using centralized useAuth hook for consistent authentication guard behavior.",
+  "frontend/src/components/Header.tsx": "Application header using centralized useAuth hook for consistent authentication state across login/logout and page reloads.",
   "frontend/src/components/Footer.tsx": "Application footer with copyright, Caffeine.ai attribution with UTM tracking, and social media links.",
   "frontend/src/components/ProfileSetup.tsx": "First-time user profile setup modal that collects the user's name before allowing access to the main application.",
   "frontend/src/index.css": "Global styles with OKLCH color system for light and dark modes, and game-specific component layer styles for tile interaction and user selection prevention.",
   "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, custom border radius, and design system tokens matching the supportive community aesthetic.",
   "frontend/src/game/match3/types.ts": "Type definitions and constants for the match-3 game with strict one-stone-per-tile board representation (8x8 grid) and CascadeResult type for tracking unique cleared tile IDs.",
   "frontend/src/game/match3/engine.ts": "Pure game logic engine with deterministic match resolution that enforces one stone per tile, validates board dimensions, and only clears contiguous horizontal/vertical matches of 3 or more stones.",
-  "frontend/src/game/match3/useMatch3Game.ts": "React hook managing match-3 game state using refs to avoid stale closures, functional state updates for deterministic behavior, and serialized move resolution with extended animation timing for 3D transitions.",
+  "frontend/src/game/match3/useMatch3Game.ts": "Match-3 game state hook with tightened animation locking using refs to prevent input during swap/cascade resolution and extended animation timing for smooth 3D transitions.",
   "frontend/src/pages/GamePage.tsx": "Match-3 game page with 3D board view using React Three Fiber, responsive layout preserving score panel and controls, and updated instructions describing one-stone-per-tile and match-3-or-more rules.",
   "frontend/src/game/three/materials.ts": "Centralized TileType-to-color mapping for 3D stone materials ensuring visual consistency with match-3 logic across six stone colors (red, blue, green, yellow, purple, orange).",
   "frontend/src/game/three/layout.ts": "Shared constants and helpers for mapping (row, col) board positions to 3D world coordinates with proper spacing, centering, and stone elevation for the 8x8 grid.",
   "frontend/src/game/three/useStoneAnimations.ts": "Animation controller hook and helpers for managing 3D stone transform animations during swaps, clears, and cascades with smooth easing functions.",
-  "frontend/src/game/three/StoneMatch3DBoard.tsx": "React Three Fiber 3D board renderer displaying an 8x8 grid with textured tiles and exactly one cylindrical stone mesh per logical tile, with interactive selection highlighting, hover effects, and orbit camera controls."
+  "frontend/src/game/three/StoneMatch3DBoard.tsx": "React Three Fiber 3D board renderer with stable position-based keys to prevent stone remounting/flickering during cascades, proper ThreeEvent types for event handlers, and input blocking during animations.",
+  "frontend/src/hooks/useAuth.ts": "Centralized authentication state hook that correctly detects non-anonymous identity for consistent auth checks across the app, working properly after page reloads."
 }

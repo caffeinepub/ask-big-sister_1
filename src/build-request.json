@@ -1,110 +1,75 @@
 {
   "kind": "build_request",
-  "title": "Convert Stone Match board to 3D and enforce one-stone-per-tile match-3 rules",
-  "projectName": "Stone Match",
+  "title": "Fix Internet Identity login state mismatch and Stone Match 3D board glitching",
+  "projectName": "Stone Match 3D",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-4",
-      "text": "Update the Stone Match gameplay rules to explicitly enforce that each board cell (tile) contains exactly one stone at all times, and that matches are formed only by stones of the same color in groups of three-or-more (match-3).",
+      "id": "REQ-1",
+      "text": "Fix the authentication gating so the app consistently treats a user as logged in when a valid Internet Identity is already loaded from storage (without requiring `loginStatus === \"success\"`). Update `frontend/src/App.tsx` and any related UI logic to use a single, correct definition of “authenticated” based on the presence of a non-anonymous identity, and ensure routing/profile-gate behavior works after page reload.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Make the stone's only one per tile, matching the stone's per same color,  make it 3D and only one stone's for each tile to be matched three of a kind."
+          "Fix the login issue,  and the glitching in the stone match 3D game."
         ]
       },
       "acceptanceCriteria": [
-        "The in-memory board representation guarantees a single stone per (row,col) position (no stacking/multiple occupancy).",
-        "A swap only clears stones when it creates a contiguous horizontal or vertical match of 3 or more stones of the same color.",
-        "User-facing help text on the game screen describes the rule as matching 3 (or more) stones of the same color."
+        "After a successful Internet Identity login, refreshing the page keeps the user recognized as logged in (no unexpected return to logged-out state).",
+        "The profile setup gate still appears for authenticated users who do not yet have a profile, including after a page reload.",
+        "No route tree / router re-creation issues occur during auth state transitions (navigation remains stable across login/logout/reload)."
       ]
     },
     {
-      "id": "REQ-5",
-      "text": "Convert the Stone Match board rendering to a real-time 3D presentation using Three.js via React Three Fiber: render an 8x8 board with a visible 3D tile for each grid cell and a single 3D stone on top of each tile, with stone appearance (material/color) derived from the existing tile type/color.",
+      "id": "REQ-2",
+      "text": "Prevent authenticated-profile React Query calls from running in an unauthenticated/anonymous state and handle backend authorization traps cleanly. Update `frontend/src/hooks/useQueries.ts` so `useGetCallerUserProfile` and wallet-related queries/mutations only execute when the user is truly authenticated, and ensure errors caused by missing auth (e.g., unauthorized traps) do not create a broken login loop or persistent error state.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "make it 3D"
+          "Fix the login issue,  and the glitching in the stone match 3D game."
         ]
       },
       "acceptanceCriteria": [
-        "The /game page renders a 3D scene (Canvas) with a clearly 3D board and stones (perspective, lighting, and depth).",
-        "Each logical tile on the board is represented by exactly one 3D stone mesh positioned over its tile.",
-        "Stone colors in 3D are consistent with the existing tile type/color mapping used by the match logic.",
-        "Clicking/selecting and swapping stones remains functional using the existing match-3 interaction model (select stone, then select adjacent stone to swap)."
+        "When not logged in, profile and wallet queries do not spam errors such as \"Actor not available\" or backend \"Unauthorized\" traps.",
+        "After login, profile and wallet queries successfully run and populate UI without requiring a manual refresh.",
+        "After logout, cached authenticated data is cleared and protected queries do not re-run until the next successful login."
       ]
     },
     {
-      "id": "REQ-6",
-      "text": "Add 3D interaction feedback and basic animation polish for the 3D Stone Match scene: indicate selected stone/tile in 3D, and animate swaps and clears/cascades so state changes are visually understandable while preventing input during animation (consistent with the existing isAnimating lockout).",
+      "id": "REQ-3",
+      "text": "Fix the Stone Match 3D gameplay “glitching” by stabilizing stone rendering and state transitions during swaps/cascades. In `frontend/src/game/three/StoneMatch3DBoard.tsx` and related match-3 state management, eliminate visual flicker/jumping caused by remounting stones (e.g., unstable React keys tied to changing tile IDs) and ensure interaction is correctly disabled while animations/state transitions are in progress.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "make it 3D"
+          "Fix the login issue,  and the glitching in the stone match 3D game."
         ]
       },
       "acceptanceCriteria": [
-        "A selected stone/tile is visually highlighted in 3D (e.g., outline, glow, scale, or ring) and updates correctly as the selection changes/clears.",
-        "When a valid swap occurs, stones animate to their new positions rather than instantly teleporting (within a short, consistent duration).",
-        "When matches clear and the board refills/cascades, the 3D scene visually reflects the change with a minimal clear/refill animation (e.g., scale down/up or fade).",
-        "User input is ignored/disabled while swap/cascade animations are running, and re-enabled once the board is stable."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Keep the existing 2D game UI shell (score, controls, instructions, background) but replace the 2D grid-of-images board area with the 3D board view, ensuring it remains responsive and does not overflow on small screens.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "make it 3D"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The score panel, New Game control, and How to Play section remain visible and functional.",
-        "The 3D board fits within the prior board container area and scales down appropriately on smaller viewports.",
-        "No broken image references remain for stones in the /game board area after the 3D view is introduced."
+        "During a valid swap and subsequent cascade resolution, stones do not visually flicker, duplicate, or appear to “teleport” due to component remounting.",
+        "Each grid cell always displays exactly one stone throughout gameplay, including during cascades.",
+        "User input is ignored while the game is animating/resolving a move (no double-click swap glitches or selection desync)."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Backend Motoko canister functionality is out of scope unless strictly required; keep all match-3 logic and 3D rendering on the frontend.",
-    "Respect the single-actor backend architecture; do not introduce additional backend services."
+    "Do not modify files under `frontend/src/hooks/useInternetIdentity.ts` or other paths listed in `frontend.immutablePaths`; apply fixes by adjusting consuming components/hooks instead.",
+    "Backend must remain a single Motoko actor in `backend/main.mo`; only introduce a `backend/migration.mo` if a state schema change is required."
   ],
   "nonGoals": [
-    "Adding multiplayer or real-time features (no WebSockets/real-time sync).",
-    "Adding third-party authentication providers (Internet Identity only).",
-    "Introducing external databases or non-Motoko backend components.",
-    "Redesigning non-game pages (e.g., wallet/profile flows) beyond any necessary styling consistency adjustments."
+    "Adding new gameplay features (power-ups, timers, multiplayer, leaderboards).",
+    "Changing authentication providers (must remain Internet Identity).",
+    "Introducing external databases or non-IC backend services."
   ],
   "imageRequirements": {
-    "required": [
-      "Seamless stone tile texture, neutral gray, subtle roughness (stone-tile-texture.dim_1024x1024.png)",
-      "Seamless stone texture for colored stones with neutral lighting (stone-texture-base.dim_1024x1024.png)"
-    ],
+    "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

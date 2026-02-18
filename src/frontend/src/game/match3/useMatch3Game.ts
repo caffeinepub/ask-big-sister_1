@@ -17,8 +17,10 @@ export function useMatch3Game() {
   isAnimatingRef.current = isAnimating;
 
   const selectTile = useCallback((position: Position) => {
-    // Check animation state from ref to avoid stale closure
-    if (isAnimatingRef.current) return;
+    // Block all input during animation - check ref for most current state
+    if (isAnimatingRef.current) {
+      return;
+    }
 
     setSelectedTile(currentSelected => {
       if (!currentSelected) {
@@ -37,14 +39,14 @@ export function useMatch3Game() {
         const result = engine.attemptSwap(currentBoard, currentSelected, position);
         
         if (result.success) {
-          // Start animation
+          // Lock input immediately
           setIsAnimating(true);
           isAnimatingRef.current = true;
           
           // Perform swap
           const swappedBoard = engine.swapTiles(currentBoard, currentSelected, position);
           
-          // Resolve all matches and cascades
+          // Resolve all matches and cascades with extended timing
           setTimeout(() => {
             const { board: finalBoard, clearedTileIds } = engine.resolveCascades(swappedBoard, result.matches);
             
@@ -54,9 +56,11 @@ export function useMatch3Game() {
             
             setBoard(finalBoard);
             boardRef.current = finalBoard;
+            
+            // Unlock input after animation completes
             setIsAnimating(false);
             isAnimatingRef.current = false;
-          }, 600);
+          }, 800);
           
           return swappedBoard;
         }
@@ -71,6 +75,11 @@ export function useMatch3Game() {
   }, []);
 
   const restart = useCallback(() => {
+    // Prevent restart during animation
+    if (isAnimatingRef.current) {
+      return;
+    }
+    
     const newBoard = engine.initializeBoard();
     setBoard(newBoard);
     boardRef.current = newBoard;

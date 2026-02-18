@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useAuth } from '../hooks/useAuth';
 import { 
   useGetCurrentWalletAddress, 
   useLinkWalletAddress, 
@@ -26,8 +26,7 @@ import {
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
-  const { identity, loginStatus } = useInternetIdentity();
-  const isAuthenticated = !!identity && loginStatus === 'success';
+  const { isAuthenticated } = useAuth();
 
   const { data: currentWalletAddress, isLoading: loadingWallet } = useGetCurrentWalletAddress();
   const linkWallet = useLinkWalletAddress();

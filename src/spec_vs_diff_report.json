@@ -1,47 +1,59 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T00:19:36.268Z",
-  "summary": "Diff implements core match-3 board model and introduces a React Three Fiber 3D board with textured tiles, colored stone meshes, and selection highlighting. However, the diff summary does not provide clear evidence that swap and cascade/clear animations are actually wired into the 3D scene, and the required texture image assets themselves are not shown as added.",
-  "missing_requirements": [
+  "generatedAt": "2026-02-18T00:31:59.364Z",
+  "summary": "REQ-1, REQ-2, and REQ-3 appear to be implemented via a new centralized auth hook (non-anonymous identity check), stable router creation and profile gating in App layout, React Query enablement/error-handling changes to avoid unauthenticated calls, and match-3 input locking plus position-based (stable) stone keys to prevent remount flicker during cascades. Several additional UI/styling and game-architecture refactors were also introduced that are not explicitly requested.",
+  "missing_requirements": [],
+  "hallucinated_features": [
     {
-      "id": "REQ-6",
-      "requirement": "Animate swaps and clears/cascades in the 3D scene so state changes are visually understandable (and keep input disabled during animation).",
-      "reason": "A helper (animateStonePosition) is added, but the 3D board component is truncated and the diff summary does not show any code that applies position/scale/fade animations during swaps or during clear/refill cascades. The game hook uses a timeout for logic resolution, but that alone is not evidence of 3D mesh animation.",
+      "description": "Homepage content/marketing layout changes (hero section, feature cards, game CTA, wallet section).",
+      "reason": "BuildRequest is focused on auth gating, query gating, and match-3 glitching fixes; it does not request homepage redesign/content additions.",
       "evidence": [
-        "frontend/src/game/three/useStoneAnimations.ts",
-        "frontend/src/game/three/StoneMatch3DBoard.tsx (truncated)",
-        "frontend/src/game/match3/useMatch3Game.ts"
+        "frontend-file-summaries.txt (frontend/src/pages/HomePage.tsx)"
       ]
     },
     {
-      "requirement": "Provide the required seamless stone texture images: stone-tile-texture.dim_1024x1024.png and stone-texture-base.dim_1024x1024.png.",
-      "reason": "The 3D board references these asset paths via useTexture(), but the diff summary does not show the image files being added anywhere in the repository changes.",
+      "description": "Global design system / Tailwind token and color-system changes.",
+      "reason": "Styling/token revamps are not requested in REQ-1/2/3 and are outside the stated fixes.",
       "evidence": [
-        "frontend/src/game/three/StoneMatch3DBoard.tsx"
+        "frontend-file-summaries.txt (frontend/src/index.css)",
+        "frontend-file-summaries.txt (frontend/tailwind.config.js)"
       ]
-    }
-  ],
-  "hallucinated_features": [
+    },
     {
-      "description": "Orbit camera controls added to the 3D scene (OrbitControls).",
-      "reason": "REQ-5/6 request a 3D presentation with clicking/selecting/swapping stones, but do not explicitly request free orbit camera controls; this is additional interaction beyond the stated requirements.",
+      "description": "Footer changes including Caffeine.ai attribution with UTM tracking and social media links.",
+      "reason": "Not requested by any requirement; unrelated to auth/query/game glitch fixes.",
       "evidence": [
-        "frontend/src/game/three/StoneMatch3DBoard.tsx"
+        "frontend-file-summaries.txt (frontend/src/components/Footer.tsx)"
+      ]
+    },
+    {
+      "description": "New 3D game rendering/architecture modules (materials/layout/useStoneAnimations) beyond the specific anti-flicker/key stabilization requirement.",
+      "reason": "REQ-3 asks for stabilizing rendering/keys and disabling interaction during transitions; introducing multiple new modules/hooks is not explicitly requested (though it may support the fix).",
+      "evidence": [
+        "frontend-file-summaries.txt (frontend/src/game/three/materials.ts)",
+        "frontend-file-summaries.txt (frontend/src/game/three/layout.ts)",
+        "frontend-file-summaries.txt (frontend/src/game/three/useStoneAnimations.ts)"
+      ]
+    },
+    {
+      "description": "ConnectWallet page adds strict wallet address format validation rules (66 chars, 0x prefix, hex-only).",
+      "reason": "REQ-2 is about gating queries/mutations and handling auth errors; it does not request new wallet-address validation behavior.",
+      "evidence": [
+        "frontend/src/pages/ConnectWallet.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/game/match3/engine.ts",
-    "frontend/src/game/match3/types.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Header.tsx",
     "frontend/src/game/match3/useMatch3Game.ts",
     "frontend/src/game/three/StoneMatch3DBoard.tsx",
-    "frontend/src/game/three/layout.ts",
-    "frontend/src/game/three/materials.ts",
-    "frontend/src/game/three/useStoneAnimations.ts",
-    "frontend/src/pages/GamePage.tsx",
+    "frontend/src/hooks/useAuth.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/ConnectWallet.tsx",
     "project_state.json"
   ]
 }

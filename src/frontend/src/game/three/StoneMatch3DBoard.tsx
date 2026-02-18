@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { Board, Position, GRID_SIZE } from '../match3/types';
@@ -62,26 +62,32 @@ function Stone({
     }
   });
   
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (!disabled) onClick();
+  };
+  
+  const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    if (!disabled) {
+      setHovered(true);
+      document.body.style.cursor = 'pointer';
+    }
+  };
+  
+  const handlePointerOut = () => {
+    setHovered(false);
+    document.body.style.cursor = 'auto';
+  };
+  
   return (
     <group position={[x, y, z]}>
       <mesh
         ref={meshRef}
         castShadow
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!disabled) onClick();
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          if (!disabled) {
-            setHovered(true);
-            document.body.style.cursor = 'pointer';
-          }
-        }}
-        onPointerOut={() => {
-          setHovered(false);
-          document.body.style.cursor = 'auto';
-        }}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
       >
         <cylinderGeometry args={[STONE_RADIUS, STONE_RADIUS, STONE_HEIGHT, 32]} />
         <meshStandardMaterial
@@ -128,11 +134,11 @@ function Scene({ board, selectedTile, onTileClick, isAnimating }: StoneMatch3DBo
         ))
       )}
       
-      {/* Stones */}
+      {/* Stones - use stable keys based on position, not tile ID */}
       {board.map((row, rowIndex) =>
         row.map((tile, colIndex) => (
           <Stone
-            key={tile.id}
+            key={`stone-${rowIndex}-${colIndex}`}
             row={rowIndex}
             col={colIndex}
             type={tile.type}
