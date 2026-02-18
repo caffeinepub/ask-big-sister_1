@@ -2,12 +2,52 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-new-match-3-game-screen-that-runs-entirely-in-the-browser-render-a-2d-grid-of-bright-cut-stone-tiles-allow-the-player-to-swap-adjacent-tiles-via-mouse-touch-detect-matches-of-3-or-more-identical-tiles-clear-matched-tiles-drop-tiles-down-to-fill-gaps-and-refill-with-new-random-tiles",
-      "featureTitle": "Add a new Match-3 game screen that runs entirely in the browser: render a 2D grid of bright, cut-stone tiles; allow the player to swap adjacent tiles via mouse/touch; detect matches of 3 or more identical tiles; clear matched tiles; drop tiles down to fill gaps; and refill with new random tiles.",
+      "featureId": "feature-stabilize-the-match-3-game-state-updates-so-rapid-user-clicks-cannot-produce-inconsistent-board-state-e-g-swaps-applied-to-a-stale-board-and-ensure-the-board-selection-animation-state-transitions-are-deterministic-and-correct",
+      "featureTitle": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
+      "files": [
+        "frontend/src/game/match3/engine.ts",
+        "frontend/src/game/match3/useMatch3Game.ts",
+        "frontend/src/pages/GamePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-match-3-scoring-and-match-accounting-so-cleared-tiles-are-counted-correctly-no-double-counting-and-no-under-counting-for-overlapping-match-shapes-and-the-displayed-score-reliably-matches-the-number-of-tiles-actually-cleared-across-the-initial-match-and-all-cascades",
+      "featureTitle": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
+      "files": [
+        "frontend/src/game/match3/engine.ts",
+        "frontend/src/game/match3/useMatch3Game.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-harden-the-match-3-render-path-to-prevent-invalid-tile-types-from-being-rendered-e-g-temporary-cleared-markers-and-ensure-tile-images-always-resolve-to-a-valid-asset-throughout-gameplay",
+      "featureTitle": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
       "files": [
         "frontend/src/game/match3/engine.ts",
         "frontend/src/game/match3/types.ts",
-        "frontend/src/game/match3/useMatch3Game.ts",
         "frontend/src/pages/GamePage.tsx"
       ],
       "components": [
@@ -19,87 +59,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-basic-game-hud-and-controls-show-current-score-a-simple-restart-new-game-control-and-a-short-on-screen-instruction-block-explaining-how-to-play-english",
-      "featureTitle": "Add basic game HUD and controls: show current score, a simple restart/new game control, and a short on-screen instruction block explaining how to play (English).",
-      "files": [
-        "frontend/src/game/match3/useMatch3Game.ts",
-        "frontend/src/pages/GamePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-12"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-the-match-3-game-into-the-existing-react-app-navigation-by-adding-a-clear-entry-point-from-the-current-ui-e-g-in-the-header-menu-and-or-the-home-page-and-register-the-new-route-in-the-app-router",
-      "featureTitle": "Integrate the Match-3 game into the existing React app navigation by adding a clear entry point from the current UI (e.g., in the header menu and/or the home page) and register the new route in the app router.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Header.tsx",
-        "frontend/src/pages/HomePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-13"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-bright-stone-themed-visual-style-to-the-game-screen-vivid-gem-stone-colors-high-contrast-readable-hud-text-and-a-playful-arcade-feel-consistent-across-the-game-ui",
-      "featureTitle": "Apply a bright, stone-themed visual style to the game screen: vivid gem/stone colors, high-contrast readable HUD text, and a playful arcade feel consistent across the game UI.",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/GamePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-14"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-static-image-assets-for-the-match-3-game-as-generated-files-under-frontend-public-assets-generated-and-use-them-in-the-game-ui-tiles-and-optionally-a-background",
-      "featureTitle": "Add static image assets for the match-3 game as generated files under frontend/public/assets/generated and use them in the game UI (tiles and optionally a background).",
-      "files": [
-        "frontend/src/pages/GamePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-15"
+        "REQ-3"
       ],
       "confidence": "high"
     }

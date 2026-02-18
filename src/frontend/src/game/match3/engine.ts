@@ -1,4 +1,4 @@
-import { Board, Tile, TileType, Position, Match, SwapResult, GRID_SIZE, TILE_TYPES } from './types';
+import { Board, Tile, TileType, Position, Match, SwapResult, CascadeResult, GRID_SIZE, TILE_TYPES } from './types';
 
 let tileIdCounter = 0;
 
@@ -63,7 +63,7 @@ export function areAdjacent(pos1: Position, pos2: Position): boolean {
   return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
 }
 
-// Swap two tiles
+// Swap two tiles (returns new board, no mutation)
 export function swapTiles(board: Board, pos1: Position, pos2: Position): Board {
   const newBoard = board.map(row => [...row]);
   const temp = newBoard[pos1.row][pos1.col];
@@ -136,30 +136,39 @@ export function findMatches(board: Board): Match[] {
   return matches;
 }
 
-// Clear matched tiles and return new board
-export function clearMatches(board: Board, matches: Match[]): Board {
+// Clear matched tiles and return new board with unique cleared tile IDs
+export function clearMatches(board: Board, matches: Match[]): { board: Board; clearedTileIds: Set<string> } {
   const newBoard = board.map(row => [...row]);
+  const clearedTileIds = new Set<string>();
   
   for (const match of matches) {
     for (const pos of match.positions) {
-      // Mark as cleared (we'll use type -1 temporarily)
-      (newBoard[pos.row][pos.col] as any).type = -1;
+      const tile = newBoard[pos.row][pos.col];
+      clearedTileIds.add(tile.id);
+      // Replace with a new tile of a placeholder type (we'll refill immediately)
+      newBoard[pos.row][pos.col] = createTile(randomTileType());
     }
   }
   
-  return newBoard;
+  return { board: newBoard, clearedTileIds };
 }
 
 // Apply gravity and refill
-export function applyGravityAndRefill(board: Board): Board {
+export function applyGravityAndRefill(board: Board, clearedPositions: Position[]): Board {
   const newBoard = board.map(row => [...row]);
+  
+  // Build a set of cleared positions for quick lookup
+  const clearedSet = new Set<string>();
+  for (const pos of clearedPositions) {
+    clearedSet.add(`${pos.row}-${pos.col}`);
+  }
   
   // Apply gravity column by column
   for (let col = 0; col < GRID_SIZE; col++) {
-    // Collect non-cleared tiles from bottom to top
+    // Collect tiles from bottom to top (excluding cleared positions)
     const tiles: Tile[] = [];
     for (let row = GRID_SIZE - 1; row >= 0; row--) {
-      if ((newBoard[row][col] as any).type !== -1) {
+      if (!clearedSet.has(`${row}-${col}`)) {
         tiles.push(newBoard[row][col]);
       }
     }
@@ -196,23 +205,34 @@ export function attemptSwap(board: Board, pos1: Position, pos2: Position): SwapR
   return { success: true, matches };
 }
 
-// Resolve cascades until no more matches
-export function resolveCascades(board: Board): { board: Board; totalMatches: Match[] } {
+// Resolve cascades until no more matches, tracking unique cleared tiles
+export function resolveCascades(board: Board, initialMatches: Match[]): CascadeResult {
   let currentBoard = board;
-  const totalMatches: Match[] = [];
-  let hasMatches = true;
+  const allClearedTileIds = new Set<string>();
   
+  // Clear initial matches
+  const { board: clearedBoard, clearedTileIds: initialCleared } = clearMatches(currentBoard, initialMatches);
+  initialCleared.forEach(id => allClearedTileIds.add(id));
+  
+  // Apply gravity for initial clear
+  const positions = initialMatches.flatMap(m => m.positions);
+  currentBoard = applyGravityAndRefill(clearedBoard, positions);
+  
+  // Resolve cascades
+  let hasMatches = true;
   while (hasMatches) {
     const matches = findMatches(currentBoard);
     
     if (matches.length === 0) {
       hasMatches = false;
     } else {
-      totalMatches.push(...matches);
-      currentBoard = clearMatches(currentBoard, matches);
-      currentBoard = applyGravityAndRefill(currentBoard);
+      const { board: newClearedBoard, clearedTileIds } = clearMatches(currentBoard, matches);
+      clearedTileIds.forEach(id => allClearedTileIds.add(id));
+      
+      const cascadePositions = matches.flatMap(m => m.positions);
+      currentBoard = applyGravityAndRefill(newClearedBoard, cascadePositions);
     }
   }
   
-  return { board: currentBoard, totalMatches };
+  return { board: currentBoard, clearedTileIds: allClearedTileIds };
 }

@@ -1,136 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Add bright stone-themed 2D match-3 game",
+  "title": "Fix Stone Match 2D match-3 gameplay issues",
   "projectName": "Stone Match",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "Add a new Match-3 game screen that runs entirely in the browser: render a 2D grid of bright, cut-stone tiles; allow the player to swap adjacent tiles via mouse/touch; detect matches of 3 or more identical tiles; clear matched tiles; drop tiles down to fill gaps; and refill with new random tiles.",
+      "id": "REQ-1",
+      "text": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-5"
         ],
         "quotes": [
-          "Make a 2D game where you have to match 3 or more of the same cut object to get points,  make it bright colors of stone's."
+          "Can you fix the 2D match game?"
         ]
       },
       "acceptanceCriteria": [
-        "A new route (e.g., /game) displays the match-3 board and can be opened without errors.",
-        "The board uses a consistent grid size (e.g., 8x8) with at least 5 distinct tile types.",
-        "Players can swap only adjacent tiles using mouse and touch interactions.",
-        "After a swap, any horizontal or vertical match of 3+ identical tiles is detected and cleared.",
-        "Tiles above cleared spaces fall downward and new tiles spawn to refill the grid until stable (no immediate matches remain, or the system resolves cascades deterministically).",
-        "A score counter increments based on cleared tiles (at minimum: +10 per tile cleared), including cascades."
+        "Repeated rapid clicking during normal play does not cause duplicated/ignored swaps, broken selection state, or a frozen isAnimating state.",
+        "After any completed move (including cascades), the rendered board matches the latest computed board state and the selected tile is cleared.",
+        "No React console errors occur during normal play (including rapid interaction)."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Add basic game HUD and controls: show current score, a simple restart/new game control, and a short on-screen instruction block explaining how to play (English).",
+      "id": "REQ-2",
+      "text": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-5"
         ],
         "quotes": [
-          "...match 3 or more... to get points..."
+          "Can you fix the 2D match game?"
         ]
       },
       "acceptanceCriteria": [
-        "HUD displays score and updates immediately after matches are cleared.",
-        "A restart/new game action resets score and regenerates a new board.",
-        "Instructions are visible on the game screen and are written in English."
+        "Score increments by exactly 10 points per unique tile cleared across the full move resolution (initial clear + cascades).",
+        "Overlapping match patterns (e.g., T/L shapes where a tile participates in both a horizontal and vertical match) are counted once per cleared tile.",
+        "Score never decreases and never increments when a swap is rejected as invalid."
       ]
     },
     {
-      "id": "REQ-13",
-      "text": "Integrate the Match-3 game into the existing React app navigation by adding a clear entry point from the current UI (e.g., in the header menu and/or the home page) and register the new route in the app router.",
+      "id": "REQ-3",
+      "text": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-5"
         ],
         "quotes": [
-          "Make a 2D game..."
+          "Can you fix the 2D match game?"
         ]
       },
       "acceptanceCriteria": [
-        "The router in frontend/src/App.tsx includes a route to the game page.",
-        "The existing header (frontend/src/components/Header.tsx) and/or home page (frontend/src/pages/HomePage.tsx) provides a visible way to navigate to the game page.",
-        "Navigation to/from the game page works without requiring changes to immutable hook files."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Apply a bright, stone-themed visual style to the game screen: vivid gem/stone colors, high-contrast readable HUD text, and a playful arcade feel consistent across the game UI.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "make it bright colors of stone's."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Game tiles and background use a bright, stone/gem-inspired palette (not muted).",
-        "Text (score/instructions/buttons) meets basic readability (clear contrast against backgrounds).",
-        "Game screen styling is consistent (spacing, typography, button styles) and uses Tailwind + existing UI components where appropriate."
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Add static image assets for the match-3 game as generated files under frontend/public/assets/generated and use them in the game UI (tiles and optionally a background).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "...cut object...bright colors of stone's."
-        ]
-      },
-      "acceptanceCriteria": [
-        "All new images are stored under frontend/public/assets/generated and referenced by URL paths from the frontend.",
-        "The game uses the generated tile images (or a generated sprite sheet) for rendering tiles.",
-        "No backend image routing is introduced."
+        "The game never attempts to render an out-of-range TILE_IMAGES index (no broken image icons due to invalid tile.type).",
+        "During match resolution, the UI either avoids rendering cleared placeholders or safely renders a defined fallback for any transient state.",
+        "Gameplay continues normally after many moves without visual corruption."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
-    "Do not edit any frontend immutable paths listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
-    "Keep the backend as a single Motoko actor in backend/main.mo; only add backend changes if explicitly required by the game.",
-    "All user-facing text added for the game must be in English."
+    "Do not modify any files under frontend/src/components/ui (shadcn components are read-only).",
+    "Do not edit any files listed in frontend.immutablePaths (compose around them instead).",
+    "Keep all game logic in the existing Match-3 module structure under frontend/src/game/match3/ (no new backend dependencies)."
   ],
   "nonGoals": [
-    "Do not add real-money payments, wallet-based gameplay, or third-party wallet integrations for the game.",
-    "Do not add multiplayer, real-time features, chat, or WebSocket-based syncing.",
-    "Do not integrate external databases or external game services.",
-    "Do not implement complex level progression/maps unless separately requested (endless / arcade match-3 is sufficient).",
-    "Do not remove or rewrite existing authentication/wallet/profile features unless necessary for navigation to the game page."
+    "Adding new game modes, power-ups, timers, levels, or monetization.",
+    "Changing Internet Identity authentication, profiles, or wallet features.",
+    "Introducing backend persistence for game progress or score."
   ],
   "imageRequirements": {
-    "required": [
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-red.dim_256x256.png)",
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-blue.dim_256x256.png)",
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-green.dim_256x256.png)",
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-yellow.dim_256x256.png)",
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-purple.dim_256x256.png)",
-      "Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-orange.dim_256x256.png)",
-      "Bright colorful stone/gem cavern background, soft gradients, subtle texture (stone-match-bg.dim_1920x1080.png)"
-    ],
+    "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

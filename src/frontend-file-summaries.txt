@@ -8,8 +8,8 @@
   "frontend/src/components/ProfileSetup.tsx": "First-time user profile setup modal that collects the user's name before allowing access to the main application.",
   "frontend/src/index.css": "Global styles with OKLCH color system and game-specific component layer styles for tile interaction and user selection prevention.",
   "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, custom border radius, and design system tokens matching the supportive community aesthetic.",
-  "frontend/src/game/match3/types.ts": "Type definitions and constants for the match-3 game including grid size, tile types, positions, and match results.",
-  "frontend/src/game/match3/engine.ts": "Pure game logic engine for match-3 mechanics including board initialization, match detection, tile swapping, gravity, refills, and cascade resolution.",
-  "frontend/src/game/match3/useMatch3Game.ts": "React hook managing match-3 game state, tile selection, swap validation, scoring, and animations with cascade support.",
-  "frontend/src/pages/GamePage.tsx": "Match-3 game page with 8x8 grid, bright stone-themed visuals, score display, controls, and instructions using generated stone tile assets."
+  "frontend/src/game/match3/types.ts": "Type definitions and constants for the match-3 game including CascadeResult type that tracks unique cleared tile IDs for accurate scoring.",
+  "frontend/src/game/match3/engine.ts": "Pure game logic engine with deterministic match resolution that tracks unique cleared tiles by ID, eliminates unsafe type mutations, and provides a single cascade resolution flow.",
+  "frontend/src/game/match3/useMatch3Game.ts": "React hook managing match-3 game state using refs to avoid stale closures, functional state updates for deterministic behavior, and serialized move resolution that prevents race conditions from rapid clicks.",
+  "frontend/src/pages/GamePage.tsx": "Match-3 game page with safe tile rendering that guards against invalid tile types using getTileImage helper and visual feedback during animation state."
 }

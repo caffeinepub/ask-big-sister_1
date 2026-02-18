@@ -1,158 +1,78 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Stone Match — Bright stone-themed 2D match-3 game (frontend)",
+  "title": "Stone Match: Deterministic Match-3 state, scoring, and safe rendering",
   "requirements": [
     {
-      "id": "REQ-11",
-      "summary": "Add a new in-browser 2D match-3 game screen with an interactive grid, swaps, match detection, clearing, gravity drop, and refills with cascades.",
+      "id": "REQ-1",
+      "summary": "Make Match-3 move resolution deterministic and immune to rapid clicks by eliminating stale state usage and enforcing a single in-flight resolution state machine.",
       "acceptanceCriteria": [
-        "A new route (e.g., /game) displays the match-3 board and can be opened without errors.",
-        "The board uses a consistent grid size (e.g., 8x8) with at least 5 distinct tile types.",
-        "Players can swap only adjacent tiles using mouse and touch interactions.",
-        "After a swap, any horizontal or vertical match of 3+ identical tiles is detected and cleared.",
-        "Tiles above cleared spaces fall downward and new tiles spawn to refill the grid until stable (no immediate matches remain, or the system resolves cascades deterministically).",
-        "A score counter increments based on cleared tiles (at minimum: +10 per tile cleared), including cascades."
+        "Repeated rapid clicking during normal play does not cause duplicated/ignored swaps, broken selection state, or a frozen isAnimating state.",
+        "After any completed move (including cascades), the rendered board matches the latest computed board state and the selected tile is cleared.",
+        "No React console errors occur during normal play (including rapid interaction)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/GamePage.tsx",
-          "operation": "create",
-          "description": "Create the Match-3 game screen that renders an 8x8 (or similar) 2D grid, handles pointer (mouse/touch) interactions for selecting and swapping adjacent tiles only, and runs the core resolve loop (detect matches, clear, drop, refill, cascade) entirely in the browser."
+          "path": "frontend/src/game/match3/useMatch3Game.ts",
+          "operation": "modify",
+          "description": "Refactor the hook to avoid stale `board` closures during swaps (use functional state updates and/or refs for latest board), serialize interactions so only one move resolves at a time, and ensure `selectedTile`/`isAnimating` transitions always complete (including early returns and invalid swaps)."
         },
         {
           "path": "frontend/src/game/match3/engine.ts",
-          "operation": "create",
-          "description": "Implement the pure game-logic engine for a 2D match-3 board: board initialization (avoid immediate matches), adjacency validation, swap simulation/rollback (if no match), match finding (horizontal/vertical 3+), clearing, gravity drop, refill, and deterministic cascade resolution."
+          "operation": "modify",
+          "description": "Adjust the engine APIs as needed to support a single deterministic move resolution flow (swap -> resolve clears/cascades -> final board) that the hook can call without relying on timeouts and intermediate stale board variables."
         },
+        {
+          "path": "frontend/src/pages/GamePage.tsx",
+          "operation": "modify",
+          "description": "Align the UI interaction wiring with the deterministic hook behavior (ensure tile clicks delegate only to the hook, and disabling/pointer-blocking during animation does not leave the board stuck or selection uncleared)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Fix scoring to count exactly 10 points per unique cleared tile per full move (initial clear + cascades), with overlap-safe accounting and no score changes on invalid swaps.",
+      "acceptanceCriteria": [
+        "Score increments by exactly 10 points per unique tile cleared across the full move resolution (initial clear + cascades).",
+        "Overlapping match patterns (e.g., T/L shapes where a tile participates in both a horizontal and vertical match) are counted once per cleared tile.",
+        "Score never decreases and never increments when a swap is rejected as invalid."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/match3/engine.ts",
+          "operation": "modify",
+          "description": "Update match accounting to return (or make computable) the set/count of uniquely cleared tiles per resolution step using stable tile identity (e.g., tile.id) so overlaps are counted once and cascades aggregate correctly."
+        },
+        {
+          "path": "frontend/src/game/match3/useMatch3Game.ts",
+          "operation": "modify",
+          "description": "Compute score increments using the engine-provided unique cleared tile count across the full move resolution; ensure invalid swaps return without mutating score and that score updates are derived from the resolved move result only."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Prevent invalid/transient tile types from reaching the render path and ensure tile images always resolve to a valid asset or defined fallback during gameplay.",
+      "acceptanceCriteria": [
+        "The game never attempts to render an out-of-range TILE_IMAGES index (no broken image icons due to invalid tile.type).",
+        "During match resolution, the UI either avoids rendering cleared placeholders or safely renders a defined fallback for any transient state.",
+        "Gameplay continues normally after many moves without visual corruption."
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/game/match3/types.ts",
-          "operation": "create",
-          "description": "Define shared types/constants for the 2D match-3 game (grid size, tile type IDs >= 5 distinct types, coordinate types, match/clear results) to keep UI and engine consistent."
-        },
-        {
-          "path": "frontend/src/game/match3/useMatch3Game.ts",
-          "operation": "create",
-          "description": "Add a React hook that owns board state and exposes actions (select, attemptSwap, resolve, restart) and computed outputs needed by the UI while keeping the engine deterministic."
-        }
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "summary": "Add a basic HUD with score, restart/new game control, and English instructions on the game screen.",
-      "acceptanceCriteria": [
-        "HUD displays score and updates immediately after matches are cleared.",
-        "A restart/new game action resets score and regenerates a new board.",
-        "Instructions are visible on the game screen and are written in English."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/GamePage.tsx",
           "operation": "modify",
-          "description": "Add HUD elements (score display, restart/new game button, and an English instruction block) and wire them to the match-3 hook so score updates immediately after clears/cascades and restart regenerates a fresh board and resets score."
+          "description": "Tighten and/or extend Match-3 types to represent any transient cleared state safely (instead of relying on an untyped sentinel), enabling compile-time protection against invalid `tile.type` rendering."
         },
         {
-          "path": "frontend/src/game/match3/useMatch3Game.ts",
+          "path": "frontend/src/game/match3/engine.ts",
           "operation": "modify",
-          "description": "Extend the hook to track score (+10 per tile cleared minimum, including cascades) and expose a restart/new-game action that resets both score and board state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "summary": "Integrate the match-3 screen into existing navigation and router with a clear entry point.",
-      "acceptanceCriteria": [
-        "The router in frontend/src/App.tsx includes a route to the game page.",
-        "The existing header (frontend/src/components/Header.tsx) and/or home page (frontend/src/pages/HomePage.tsx) provides a visible way to navigate to the game page.",
-        "Navigation to/from the game page works without requiring changes to immutable hook files."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register a new /game route in the TanStack Router route tree and wire it to the new GamePage component."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Add a visible navigation entry (e.g., a button/link) that routes to /game from the existing header without changing any immutable hook files."
-        },
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Add a prominent entry point (e.g., a feature card or call-to-action button) that navigates to /game so users can discover the Match-3 game from the current UI."
-        }
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "summary": "Apply a bright, stone-themed visual style across the game screen (tiles, background, HUD typography/spacing/buttons) using Tailwind and existing UI components.",
-      "acceptanceCriteria": [
-        "Game tiles and background use a bright, stone/gem-inspired palette (not muted).",
-        "Text (score/instructions/buttons) meets basic readability (clear contrast against backgrounds).",
-        "Game screen styling is consistent (spacing, typography, button styles) and uses Tailwind + existing UI components where appropriate."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/GamePage.tsx",
-          "operation": "modify",
-          "description": "Apply a bright, gem/stone arcade look using Tailwind utility classes and existing shadcn/ui components (e.g., Button/Card) for consistent spacing/typography and high-contrast readable HUD over a vibrant background. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add small, scoped base/component layer styles (if needed) to support consistent game UI readability (e.g., default text smoothing/selection outlines for interactive tiles) without introducing new global stylesheet paths."
-        }
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "summary": "Add and use generated static image assets for tile faces and an optional background under frontend/public/assets/generated.",
-      "acceptanceCriteria": [
-        "All new images are stored under frontend/public/assets/generated and referenced by URL paths from the frontend.",
-        "The game uses the generated tile images (or a generated sprite sheet) for rendering tiles.",
-        "No backend image routing is introduced."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/stone-tile-red.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the red bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-blue.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the blue bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-green.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the green bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-yellow.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the yellow bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-purple.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the purple bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-tile-orange.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated tile image asset (transparent PNG) for the orange bright faceted cut-stone tile."
-        },
-        {
-          "path": "frontend/public/assets/generated/stone-match-bg.dim_1920x1080.png",
-          "operation": "create",
-          "description": "Add generated background image asset for the bright colorful stone/gem cavern background."
+          "description": "Remove unsafe mutation that can introduce invalid tile types into live board objects, and ensure cleared/transient states are represented in a way that the UI can safely handle (no out-of-range tile.type values)."
         },
         {
           "path": "frontend/src/pages/GamePage.tsx",
           "operation": "modify",
-          "description": "Wire the generated assets into the game UI by mapping tile types to the corresponding images (frontend/public/assets/generated/stone-tile-red.dim_256x256.png, frontend/public/assets/generated/stone-tile-blue.dim_256x256.png, frontend/public/assets/generated/stone-tile-green.dim_256x256.png, frontend/public/assets/generated/stone-tile-yellow.dim_256x256.png, frontend/public/assets/generated/stone-tile-purple.dim_256x256.png, frontend/public/assets/generated/stone-tile-orange.dim_256x256.png) and optionally using the background (frontend/public/assets/generated/stone-match-bg.dim_1920x1080.png); ensure assets are referenced as static public files and no backend image routing is added."
+          "description": "Harden tile rendering by guarding TILE_IMAGES access (render nothing or a defined fallback when a cell is cleared/transient) so the UI never indexes TILE_IMAGES with an invalid value."
         }
       ]
     }

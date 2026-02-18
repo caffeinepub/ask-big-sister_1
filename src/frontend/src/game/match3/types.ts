@@ -26,3 +26,8 @@ export interface SwapResult {
   success: boolean;
   matches: Match[];
 }
+
+export interface CascadeResult {
+  board: Board;
+  clearedTileIds: Set<string>;
+}

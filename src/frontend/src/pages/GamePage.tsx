@@ -1,5 +1,5 @@
 import { useMatch3Game } from '../game/match3/useMatch3Game';
-import { Position, GRID_SIZE } from '../game/match3/types';
+import { Position, GRID_SIZE, TileType } from '../game/match3/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RotateCcw, Sparkles } from 'lucide-react';
@@ -22,6 +22,14 @@ export default function GamePage() {
 
   const isSelected = (row: number, col: number): boolean => {
     return selectedTile?.row === row && selectedTile?.col === col;
+  };
+
+  const getTileImage = (type: TileType): string => {
+    // Guard against invalid tile types
+    if (type < 0 || type >= TILE_IMAGES.length) {
+      return TILE_IMAGES[0]; // Fallback to first image
+    }
+    return TILE_IMAGES[type];
   };
 
   return (
@@ -69,7 +77,7 @@ export default function GamePage() {
                           transition-all duration-200 ease-out
                           hover:scale-110 active:scale-95
                           ${selected ? 'ring-4 ring-yellow-400 scale-110 shadow-lg shadow-yellow-400/50' : ''}
-                          ${isAnimating ? 'pointer-events-none' : 'cursor-pointer'}
+                          ${isAnimating ? 'pointer-events-none opacity-90' : 'cursor-pointer'}
                           bg-black/40
                         `}
                         style={{
@@ -78,7 +86,7 @@ export default function GamePage() {
                         }}
                       >
                         <img
-                          src={TILE_IMAGES[tile.type]}
+                          src={getTileImage(tile.type)}
                           alt={`Stone ${tile.type}`}
                           className="w-full h-full object-contain"
                           draggable={false}

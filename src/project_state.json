@@ -1,167 +1,39 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
-  "summary": "Pivot to building a bright, colorful 2D match-3 style game where players match 3+ identical “cut stone” objects to score points.",
+  "projectStateVersion": 3,
+  "summary": "2D match game project",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-red.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-blue.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-green.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-yellow.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-purple.dim_256x256.png)\n- Bright faceted cut-stone tile set, 6 distinct colors, each as separate transparent PNG (stone-tile-orange.dim_256x256.png)\n- Bright colorful stone/gem cavern background, soft gradients, subtle texture (stone-match-bg.dim_1920x1080.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-implement-internet-identity-sign-in-and-a-minimal-user-profile-identity-used-throughout-the-app-display-name-derived-from-the-authenticated-principal-with-an-optional-editable-nickname",
-      "title": "Implement Internet Identity sign-in and a minimal user profile identity used throughout the app (display name derived from the authenticated principal, with an optional editable nickname).",
+      "id": "feature-stabilize-the-match-3-game-state-updates-so-rapid-user-clicks-cannot-produce-inconsistent-board-state-e-g-swaps-applied-to-a-stale-board-and-ensure-the-board-selection-animation-state-transitions-are-deterministic-and-correct",
+      "title": "Stabilize the Match-3 game state updates so rapid user clicks cannot produce inconsistent board state (e.g., swaps applied to a stale board), and ensure the board/selection/animation state transitions are deterministic and correct.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-frontend-screens-to-browse-questions-view-a-question-detail-page-and-allow-signed-in-users-to-post-new-questions-and-post-answers-to-existing-questions",
-      "title": "Create frontend screens to browse questions, view a question detail page, and allow signed-in users to post new questions and post answers to existing questions.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-an-in-app-ai-can-also-answer-questions-feature-on-the-question-detail-page-allow-users-to-request-an-ai-style-supportive-response-generated-deterministically-on-canister-no-external-ai-llm-api-using-templates-heuristics-and-store-it-as-a-special-answer-type-attributed-to-big-sister-ai",
-      "title": "Add an in-app “AI can also answer questions” feature: on the Question Detail page, allow users to request an AI-style supportive response, generated deterministically on-canister (no external AI/LLM API) using templates/heuristics, and store it as a special answer type attributed to “Big Sister AI”.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-establish-a-cohesive-visual-theme-suitable-for-a-supportive-women-focused-q-a-community-warm-calm-editorial-feel-accessible-typography-consistent-spacing-and-components-and-apply-it-consistently-across-the-app",
-      "title": "Establish a cohesive visual theme suitable for a supportive women-focused Q&A community (warm, calm, editorial feel; accessible typography; consistent spacing and components) and apply it consistently across the app.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-include-a-small-set-of-static-brand-assets-and-render-them-in-the-ui-from-frontend-public-assets-generated-no-backend-image-routing",
-      "title": "Generate and include a small set of static brand assets and render them in the UI from frontend/public/assets/generated (no backend image routing).",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-connect-wallet-entry-point-in-the-ui-for-signed-in-users-that-lets-them-link-a-crypto-wallet-address-to-their-ask-big-sister-profile-session-without-relying-on-third-party-wallet-integrations",
-      "title": "Add a “Connect Wallet” entry point in the UI for signed-in users that lets them link a crypto wallet address to their Ask Big Sister profile/session without relying on third-party wallet integrations.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-frontend-flow-to-view-add-edit-and-remove-the-linked-wallet-address-using-the-new-backend-apis-including-basic-validation-and-error-handling",
-      "title": "Implement the frontend flow to view, add, edit, and remove the linked wallet address using the new backend APIs, including basic validation and error handling.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-new-match-3-game-screen-that-runs-entirely-in-the-browser-render-a-2d-grid-of-bright-cut-stone-tiles-allow-the-player-to-swap-adjacent-tiles-via-mouse-touch-detect-matches-of-3-or-more-identical-tiles-clear-matched-tiles-drop-tiles-down-to-fill-gaps-and-refill-with-new-random-tiles",
-      "title": "Add a new Match-3 game screen that runs entirely in the browser: render a 2D grid of bright, cut-stone tiles; allow the player to swap adjacent tiles via mouse/touch; detect matches of 3 or more identical tiles; clear matched tiles; drop tiles down to fill gaps; and refill with new random tiles.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-basic-game-hud-and-controls-show-current-score-a-simple-restart-new-game-control-and-a-short-on-screen-instruction-block-explaining-how-to-play-english",
-      "title": "Add basic game HUD and controls: show current score, a simple restart/new game control, and a short on-screen instruction block explaining how to play (English).",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-integrate-the-match-3-game-into-the-existing-react-app-navigation-by-adding-a-clear-entry-point-from-the-current-ui-e-g-in-the-header-menu-and-or-the-home-page-and-register-the-new-route-in-the-app-router",
-      "title": "Integrate the Match-3 game into the existing React app navigation by adding a clear entry point from the current UI (e.g., in the header menu and/or the home page) and register the new route in the app router.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-bright-stone-themed-visual-style-to-the-game-screen-vivid-gem-stone-colors-high-contrast-readable-hud-text-and-a-playful-arcade-feel-consistent-across-the-game-ui",
-      "title": "Apply a bright, stone-themed visual style to the game screen: vivid gem/stone colors, high-contrast readable HUD text, and a playful arcade feel consistent across the game UI.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-static-image-assets-for-the-match-3-game-as-generated-files-under-frontend-public-assets-generated-and-use-them-in-the-game-ui-tiles-and-optionally-a-background",
-      "title": "Add static image assets for the match-3 game as generated files under frontend/public/assets/generated and use them in the game UI (tiles and optionally a background).",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    }
-  ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Allow users to post/ask questions to the community",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Allow users to answer/reply to other users' questions",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Provide an AI feature that can also answer questions",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Add backend data models and APIs to create and fetch community questions (including title, body, author, createdAt) and to list questions in reverse chronological order with basic pagination support.",
+      "id": "feature-fix-match-3-scoring-and-match-accounting-so-cleared-tiles-are-counted-correctly-no-double-counting-and-no-under-counting-for-overlapping-match-shapes-and-the-displayed-score-reliably-matches-the-number-of-tiles-actually-cleared-across-the-initial-match-and-all-cascades",
+      "title": "Fix Match-3 scoring and match accounting so cleared tiles are counted correctly (no double-counting and no under-counting for overlapping match shapes), and the displayed score reliably matches the number of tiles actually cleared across the initial match and all cascades.",
       "reqIds": [
         "REQ-2"
       ],
-      "status": "pending"
+      "version": 1
     },
     {
-      "id": "AR-6",
-      "summary": "Add backend data models and APIs to create and fetch answers for a given question (including body, author, createdAt), and return answers ordered from oldest to newest by default.",
+      "id": "feature-harden-the-match-3-render-path-to-prevent-invalid-tile-types-from-being-rendered-e-g-temporary-cleared-markers-and-ensure-tile-images-always-resolve-to-a-valid-asset-throughout-gameplay",
+      "title": "Harden the Match-3 render path to prevent invalid tile types from being rendered (e.g., temporary cleared markers) and ensure tile images always resolve to a valid asset throughout gameplay.",
       "reqIds": [
         "REQ-3"
       ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Add a “Connect Wallet” feature to the Ask Big Sister app (allow users to connect a crypto wallet to their account/session).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Extend the backend user profile model to store an optional wallet address string for each authenticated principal, and provide canister methods to read/update/clear the wallet address for the current signed-in user.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Create a 2D match-3 game: match 3+ identical cut-stone tiles to earn points, using a bright stone-themed color palette.",
-      "reqIds": [],
-      "status": "pending"
+      "version": 1
     }
   ],
+  "new_feature_requests": [],
   "gameProjectType": "2d",
-  "projectName": "Ask Big Sister",
+  "projectName": "Stone Match",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
